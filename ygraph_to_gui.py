@@ -196,7 +196,7 @@ class App:
         rect_id = self.canvas.create_rectangle(item.x0, item.y0, item.x1, item.y1, outline='gray',width=2)
         item.rect_id =rect_id
         #item.rect_id = self.canvas.create_rectangle(item.x0-2, item.y0-2, item.x1+2, item.y1+2, outline='gray', width=2)
-        item.text_id = self.canvas.create_text((item.x0 + item.x1) / 2, (item.y0 + item.y1) / 2, text=item.text)
+        item.text_id = self.canvas.create_text((item.x0 + item.x1) / 2, (item.y0 + item.y1) / 2, text=item.item)
         #self.canvas.tag_bind(item.rect_id, '<Button-1>', lambda event, item=item: self.on_item_click(event, item))
         #self.canvas.tag_bind(item.text_id, '<Button-1>', lambda event, item=item: self.on_item_click(event, item))
         self.items[rect_id]=item
