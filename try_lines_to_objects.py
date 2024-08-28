@@ -72,7 +72,7 @@ root
 well_placed
 """
 
-text ="""
+text = """
 public void fn(n):
     n = n+1
     return n
@@ -80,13 +80,13 @@ public void fn(n):
 """
 
 import pprint as pp
-toObjs = yLinesToObjectsByIndents(convert_fn,child_react= child_react_set_child , output_root_only = True)
+toObjs = yLinesToObjectsByIndents(convert_fn, child_react=child_react_set_child, output_root_only = True)
 lines = text.splitlines()
 
 items = list(toObjs.iterate_items(lines))
-for  ctx, root in items:
+for ctx, root in items:
     print(root)
-    print(root.dstr())
+    print(root.dumps())
 
 """
 (None, <Project: <Planning: <Milestone1: <Task1>, <Task2>>, <Milestone2: <Task3>>>, <Development: <Phase1: <Task4>, <Task5>>, <Phase2: <Task6>>>>)
