@@ -38,7 +38,7 @@ def child_react_set_child(parent, child):
         parent.children.append(child)
 
 
-class yLinesToObjectsByIndents:
+class Gol:
 
     def __init__(
             self,convert_fn=None,
@@ -55,6 +55,30 @@ class yLinesToObjectsByIndents:
         self.alignment = alignment
         self.child_react = child_react
         self.not_allow_misplacing = True
+        self.get_children_fn = lambda item: item.children
+        self.get_value_fn = lambda item: item.value
+
+    def dump_gen(self,item,indent,ident_symbol = "\t"):
+        stack = [(item,indent)]
+        while stack:
+            item,indent = stack. pop()
+            line = f'{indent}{self.get_value_fn(item)}\n'
+            yield line
+            children = list(self.get_children_fn(item))
+            children.reverse()
+            if children:
+                new_indent = f'{ident_symbol}{indent}'
+            for child in children:
+                stack.append((child,new_indent))
+
+    def dumps(self,item):
+        return "".join(self.dump_gen(item, "", "\t"))
+
+    def dump(self,item,file):
+        for line in self.dump_gen(item, "", "\t"):
+            file.write(line)
+
+
 
     def child_react_set_child(self,parent, child):
         #print("append " , parent, child)
@@ -75,7 +99,15 @@ class yLinesToObjectsByIndents:
         current_indent = len(line) - len(line_strip)
         return current_indent, line_strip
 
-    def iterate_items(self,lines):
+
+    def loads(self,text):
+        return [item for ctx,item in self.load_gen(text.splitlines())]
+
+    def load(self, file):
+        return [item for ctx,item in self.load_gen(file.readlines())]
+
+
+    def load_gen(self,lines):
         stack = []
         ctx_indent = -1
         prev_indent = 0
