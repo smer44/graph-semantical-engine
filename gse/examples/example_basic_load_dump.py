@@ -1,4 +1,5 @@
-from gol import *
+from gse.gol import *
+
 
 text = """Item1
     SubItem1 # this is a sub item

@@ -1,4 +1,7 @@
+from argparse import ArgumentParser
+
 import requests
+
 
 def dfs_once(item, cfn):
     stack = [item]
@@ -9,6 +12,7 @@ def dfs_once(item, cfn):
             if child not in dejavu:
                 dejavu.add(child)
                 stack.append(child)
+
 
 def handle_object(obj):
     object_id, object_name = obj
@@ -50,11 +54,30 @@ def handle_object(obj):
     else:
         print('Error:', response.status_code)
 
-#for child in handle_object(("Q146","cat",)):  pass#
+
+def cli():
+    parser = ArgumentParser(
+        prog='SPARKQL entity searcher',
+        description='The program to search superclass by SPARKQL',
+    )
+    parser.add_argument(
+        'entity_id',
+        nargs=1,
+        type=str,
+        help='Entity\'s ID',
+    )
+    parser.add_argument(
+        'entity_name',
+        nargs=1,
+        type=str,
+        help='Entity\'s name',
+    )
+    args = parser.parse_args()
+    dfs_once(
+        (args.entity_id[0], args.entity_name[0]),
+        handle_object,
+    )
 
 
-dfs_once(("Q146","cat",),handle_object)
-# Example Output
-# http://www.wikidata.org/entity/Q55983715 - domesticated animal
-# http://www.wikidata.org/entity/Q729 - mammal
-# ...
+if __name__ == '__main__':
+    cli()

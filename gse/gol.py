@@ -78,8 +78,6 @@ class Gol:
         for line in self.dump_gen(item, "", "\t"):
             file.write(line)
 
-
-
     def child_react_set_child(self,parent, child):
         #print("append " , parent, child)
         parent.children.append(child)
@@ -160,3 +158,19 @@ class Gol:
             # Update previous indentation level
             prev_item  = item
             prev_indent = current_level
+
+
+def load(file):
+    Gol().load(file)
+
+
+def loads(text):
+    return Gol().loads(text)
+
+
+def dump(item, file):
+    Gol().dump(item, file)
+
+
+def dumps(item):
+    return Gol().dumps(item)

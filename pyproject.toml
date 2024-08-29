@@ -1,0 +1,30 @@
+[project]
+name = "gse"
+description = "Graph semantic engine"
+readme = { file = "README.md", content-type = "text/markdown" }
+version = "0.0.1"
+authors = [
+    { name = "smer44"}
+]
+license = { file = "LICENSE.txt" }
+maintainers = [
+   { name = "Polyakov Konstantin", email = "shyzik93@mail.ru" },
+   { name = "smer44"}
+]
+classifiers = [
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+]
+dependencies = [
+    "requests == 2.32.3",
+]
+
+[project.gui-scripts]
+gse = "gse.gui:run"
+[project.scripts]
+gse-wd-label = "gse.tut_wikidata.tut_wikidata_get_label:cli"
+gse-wd-soap = "gse.tut_wikidata.tut_wikidata_soap:cli"
+gse-wd-sparkql = "gse.tut_wikidata.tut_wikidata_sparkql_superclasses:cli"
+
+[build-system]
+requires = ["setuptools", "wheel"]
