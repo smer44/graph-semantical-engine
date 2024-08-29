@@ -1,5 +1,5 @@
-from gol import *
-from gutil import ObjGraph
+from gse.gol import *
+from gse.gutil import ObjGraph
 
 text = """Item1
     SubItem1 # this is a sub item
