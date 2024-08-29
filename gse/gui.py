@@ -1,5 +1,13 @@
 import tkinter as tk
-from tkinter import simpledialog
+from tkinter import (
+    Frame,
+    Label,
+    Menu,
+    StringVar,
+    filedialog,
+    simpledialog,
+)
+
 
 #TODO - item is view.
 class Item:
@@ -22,8 +30,8 @@ class Item:
     def __repr__(self):
         return f"<!{self.rect_id}:{self.text}!>"
 
-class GraphToView:
 
+class GraphToView:
     def __init__(self):
         self.add_edge = self.__add_edge_view_item__
         self.to_view_node = self.__to_view_item__
@@ -35,7 +43,6 @@ class GraphToView:
         row = view_item_fro.children_refs.setdefault(edge_type, set())
         assert view_item_to not in row
         row.add(view_item_to)
-
 
     def linear_convert_nodes(self,nodes,edges):
         converted_items = dict()
@@ -63,18 +70,14 @@ class gViewRechtPlaser:
     #TODO - copy plaser
 
 
-
-
-
-
-
-
-
-
-
 class App:
     def __init__(self, root):
         self.root = root
+        self._add_menubar()
+        self.variable_status = StringVar(self.root, 'не сохранено')
+        self.variable_filename = StringVar(self.root, 'Новый файл')
+        self._add_status_bar()
+        self.file_name_graph = None
         self.canvas = tk.Canvas(root, width=800, height=600, bg='white')
         self.canvas.pack(fill=tk.BOTH, expand=True)
         self.selected_items = dict()
@@ -92,9 +95,57 @@ class App:
         self.create_counter = 0
         self.create_items()
 
+    def _add_menubar(self):
+        menubar = Menu(self.root)
+        self.root.config(menu=menubar)
 
+        file_menu = Menu(menubar)
+        file_menu.add_command(label='Сохранить', command=self._on_save_graph)
+        file_menu.add_command(label='Открыть', command=self._on_open_graph)
+        file_menu.add_command(label='Создать новый', command=self._on_new_graph)
 
+        menubar.add_cascade(label="Файл", menu=file_menu)
 
+    def _add_status_bar(self):
+        frame = Frame(self.root)
+        label_status = Label(frame, textvariable=self.variable_status)
+        label_status.pack(side=tk.LEFT)
+        label_filename = Label(frame, textvariable=self.variable_filename)
+        label_filename.pack(side=tk.LEFT)
+        frame.pack(side=tk.BOTTOM)
+
+    def _print_to_filename_bar(self, message):
+        cut_message = message if len(message) < 40 else f'{message[:19]}...{message[-18:]}'
+        self.variable_filename.set(cut_message)
+
+    def _on_save_graph(self):
+        """Method to save the graph to a file"""
+        file_name_graph = filedialog.asksaveasfilename(
+            filetypes=(('TXT files', '*.txt'), ('YAML files', '*.yaml')),
+            initialfile=self.file_name_graph,
+        )
+        if file_name_graph:
+            with open(file_name_graph, 'w', encoding='utf-8') as file_graph:
+                pass
+
+            self.file_name_graph = file_name_graph
+            self._print_to_filename_bar(file_name_graph)
+            self.variable_status.set('сохранено')
+
+    def _on_open_graph(self):
+        """Method to open a graph from the file"""
+        file_name_graph = filedialog.askopenfilename(filetypes=(('TXT files', '*.txt'), ('YAML files', '*.yaml')))
+        if file_name_graph:
+            with open(file_name_graph, 'r', encoding='utf-8') as file_graph:
+                pass
+
+            self.file_name_graph = file_name_graph
+            self._print_to_filename_bar(file_name_graph)
+
+    def _on_new_graph(self):
+        self.file_name_graph = None
+        self.variable_status.set('не сохранено')
+        self._print_to_filename_bar('Новый файл')
 
     def create_items(self):
         # Initialize some Item objects
@@ -165,7 +216,6 @@ class App:
         else:
             return self.calc_arrow_line_coords(fro,to)
 
-
     def calc_arrow_line_coords(self,fro,to):
         fro_mid_x, fro_mid_y = (fro.x0 + fro.x1) / 2, (fro.y0 + fro.y1) / 2
         to_mid_x, to_mid_y = (to.x0 + to.x1) / 2, (to.y0 + to.y1) / 2
@@ -188,9 +238,6 @@ class App:
 
         coords = mid_x, item.y1, mid_x,item.y1+dy,item.x1+dx,item.y1+dy, item.x1+dx, mid_y, item.x1, mid_y,
         return coords
-
-
-
 
     def add_item_to_canvas(self, item):
         rect_id = self.canvas.create_rectangle(item.x0, item.y0, item.x1, item.y1, outline='gray',width=2)
@@ -238,8 +285,6 @@ class App:
 
         self.canvas.itemconfig(id, outline=outline)
 
-
-
     def on_shift_x_press(self,event):
         #print("on_shift_x_press called")
         pairs = list(self.selected_items.items())
@@ -247,7 +292,6 @@ class App:
             for child_id, arrow_id in item.children.items():
                 if child_id not in self.selected_items:
                     self.switch_item(self.items[child_id])
-
 
     def on_button_press(self, event):
         item = self.find_closest_item(event.x, event.y)
@@ -288,8 +332,6 @@ class App:
             else:
                 self.deselect_all(None)
 
-
-
     def execute_task(self, item,event):
 
         if self.tasks_after =="create":
@@ -323,7 +365,6 @@ class App:
             self.canvas.move(item.rect_id, dx, dy)
             self.canvas.move(item.text_id, dx, dy)
 
-
             item.x0 += dx
             item.y0 += dy
             item.x1 += dx
@@ -356,9 +397,6 @@ class App:
                 self.selected_for_connect = None
                 self.update_color(old_selected_item)
 
-
-
-
     def find_closest_item(self, x, y):
         for item in self.items.values():
             if item.x0 <= x <= item.x1 and item.y0 <= y <= item.y1:
@@ -373,8 +411,6 @@ class App:
                 item.text = new_text
                 self.canvas.itemconfig(item.text_id, text=new_text)
 
-
-
     def create_new_item(self, x, y):
         print ("create_new_item: " , x, y )
         dx0,dy0,dx1,dy1 = -50,-25,50,25  # Define the size of the new item
@@ -384,7 +420,6 @@ class App:
         new_item = Item(x+dx0, y+dy0, x + dx1, y + dy1, text,text )
         self.create_counter+=1
         self.add_item_to_canvas(new_item)
-
 
     def delete_item(self, item):
         print("delete_item: ", item)
@@ -408,6 +443,7 @@ class App:
             self.canvas.delete(arrow_id)
             other_item = self.items[rect_id]
             del other_item.children[item.rect_id]
+
 
 def run():
     root = tk.Tk()
