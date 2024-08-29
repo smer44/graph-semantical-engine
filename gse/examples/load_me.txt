@@ -1,0 +1,133 @@
+Living Room
+    Furniture
+        Sofa
+            Cushions
+            Throw Blanket
+        Coffee Table
+            Coasters
+            Magazines
+            Remote Control
+            Decorative Tray
+                Candles
+                Vase
+                    Flowers
+        Armchair
+            Pillow
+        Bookshelf
+            Books
+            Picture Frames
+            Decorative Items
+    Electronics
+        Television
+            TV Stand
+                Cable Box
+                Gaming Console
+                DVD Player
+            Remote Control
+        Sound System
+            Speakers
+            Subwoofer
+            Receiver
+        Lamp
+            Light Bulb
+    Decorations
+        Wall Art
+        Curtains
+        Rug
+        Indoor Plant
+            Planter
+                Potting Soil
+    Storage
+        Side Table
+            Drawer
+                Coasters
+                Chargers
+        Media Cabinet
+            Shelves
+                DVDs
+                Board Games
+    Lighting
+        Ceiling Light
+            Light Bulb
+        Floor Lamp
+            Lampshade
+
+Bedroom
+    Furniture
+        Bed
+            Mattress
+            Pillows
+            Sheets
+            Comforter
+            Bed Frame
+                Headboard
+                Footboard
+            Bedside Table
+                Lamp
+                    Light Bulb
+                Alarm Clock
+                Books
+                Glass of Water
+        Wardrobe
+            Hanging Clothes
+            Shelves
+                Folded Clothes
+                Accessories
+                    Belts
+                    Scarves
+                Storage Boxes
+        Dresser
+            Drawers
+                Socks
+                Underwear
+                T-shirts
+                Jewelry
+            Mirror
+                Jewelry Box
+        Chair
+            Throw Blanket
+            Pillow
+        Vanity
+            Mirror
+            Makeup
+            Hairbrush
+            Perfume
+    Electronics
+        Television
+            TV Stand
+                Remote Control
+        Phone Charger
+            Power Cable
+            Adapter
+        Table Lamp
+            Light Bulb
+    Decorations
+        Wall Art
+        Curtains
+        Rug
+        Indoor Plant
+            Planter
+                Potting Soil
+        Picture Frames
+    Storage
+        Closet
+            Hanging Clothes
+            Shoe Rack
+                Shoes
+            Shelves
+                Storage Boxes
+                    Seasonal Clothes
+                Bags
+                    Handbags
+                    Backpacks
+        Under-bed Storage
+            Bins
+                Extra Bedding
+                Out-of-season Clothes
+    Lighting
+        Ceiling Light
+            Light Bulb
+        Nightstand Lamp
+            Lampshade
+        Reading Light
+            Light Bulb
