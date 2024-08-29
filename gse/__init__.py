@@ -22,7 +22,6 @@ def load(self, file):
 
     return [item for ctx, item in gol.load_gen(file.readlines())]
 
-#TODO - make it to graph, node interface
 
 def dumps(self,graph,item):
     gol = Gol(graph, output_root_only=True)

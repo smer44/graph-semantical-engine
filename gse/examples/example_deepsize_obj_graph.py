@@ -21,7 +21,7 @@ og.add_child(ab,ab2)
 og.add_child(ab,ab3)
 
 
-#print(root.dumps())
+print(root.dumps())
 
 
 gu = gUtil()

@@ -29,8 +29,8 @@ class ObjNode:
             line = f'{indent}{node.value}#{node.deepsize}\n'
             output_lines.append(line)
             children = list(node.children)
-            children.reverse()
             if children:
+                children.reverse()
                 new_indent = f'{ident_symbol}{indent}'
                 for child in children:
                     stack.append((child,new_indent))
@@ -68,3 +68,4 @@ class ObjGraph:
 
     def children(self,node):
         return node.children
+

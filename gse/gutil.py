@@ -1,8 +1,3 @@
-
-
-
-
-
 class gUtil:
     def calc_deepsize(self,graph,roots):
         """
