@@ -1,5 +1,5 @@
 from gse.gol import *
-from gse.gutil import ObjGraph
+from gse.objgraph import ObjGraph
 
 text = """Item1
     SubItem1 # this is a sub item
@@ -89,13 +89,13 @@ items = list(gol.load_gen(lines))
 for ctx, root in items:
     print(root)
     print(root.dumps())
-    print(gol.dumps(root))
+    #print(gol.dumps(root))
 
-print("gol.loads:")
-roots = gol.loads(text)
+#print("gol.loads:")
+#roots = gol.loads(text)
 
-for root in roots:
-    print(gol.dumps(root))
+#for root in roots:
+#    print(gol.dumps(root))
 
 """
 (None, <Project: <Planning: <Milestone1: <Task1>, <Task2>>, <Milestone2: <Task3>>>, <Development: <Phase1: <Task4>, <Task5>>, <Phase2: <Task6>>>>)

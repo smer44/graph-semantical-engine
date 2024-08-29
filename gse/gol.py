@@ -26,34 +26,33 @@ class Gol:
 
         self.not_allow_misplacing = True
 
-        self.get_children_fn = lambda item: item.children
-        self.get_value_fn = lambda item: item.value
-        self.convert_fn = lambda graph, value: graph.new_node(value)
-        self.child_react = lambda graph,parent,child:graph.add_child(parent,child)
+        #self.get_children_fn = lambda item: item.children
+        #self.get_value_fn = lambda item: item.value
+        #self.convert_fn = lambda graph, value: graph.new_node(value)
+        self.child_react = self.child_react_add_child
 
     def dump_gen(self,item,indent,ident_symbol = "\t"):
+        get_value_fn = self.graph.get_value
+        get_children_fn = self.graph.children
+
         stack = [(item,indent)]
         while stack:
             item,indent = stack. pop()
-            line = f'{indent}{self.get_value_fn(item)}\n'
+            line = f'{indent}{get_value_fn(item)}\n'
             yield line
-            children = list(self.get_children_fn(item))
+            children = list(get_children_fn(item))
             children.reverse()
             if children:
                 new_indent = f'{ident_symbol}{indent}'
                 for child in children:
                     stack.append((child,new_indent))
 
-    def dumps(self,item):
-        return "".join(self.dump_gen(item, "", "\t"))
 
-    def dump(self,item,file):
-        for line in self.dump_gen(item, "", "\t"):
-            file.write(line)
 
-    def child_react_set_child(self,parent, child):
+    def child_react_add_child(self,parent, child):
         #print("append " , parent, child)
-        parent.children.append(child)
+        #parent.children.append(child)
+        self.graph.add_child(parent,child)
 
     def pp(self,*text):
         if self.verbose:
@@ -71,11 +70,7 @@ class Gol:
         return current_indent, line_strip
 
 
-    def loads(self,text):
-        return [item for ctx,item in self.load_gen(text.splitlines())]
 
-    def load(self, file):
-        return [item for ctx,item in self.load_gen(file.readlines())]
 
 
 
@@ -84,7 +79,7 @@ class Gol:
         ctx_indent = -1
         prev_indent = 0
         prev_item = None
-        convert_fn = self.convert_fn
+        convert_fn = self.graph.new_node
         ctx = None
         pp = self.pp
         alignment = self.alignment
@@ -99,7 +94,7 @@ class Gol:
             if not line:
                 continue
             if convert_fn:
-                item = convert_fn(graph,line)
+                item = convert_fn(line)
             else:
                 item = line
             #print("ctx  ", stack[-1], "level " , current_level)
@@ -123,7 +118,7 @@ class Gol:
             pp(' - !! - stack : ' , stack, ", ctx: " , ctx)
             if ctx is not None:
                 if child_react:
-                    child_react(graph,ctx,item)
+                    child_react(ctx,item)
                 if not output_root_only:
                     yield ctx, item
             else:
@@ -133,3 +128,5 @@ class Gol:
             # Update previous indentation level
             prev_item  = item
             prev_indent = current_level
+
+
