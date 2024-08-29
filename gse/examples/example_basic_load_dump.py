@@ -1,5 +1,5 @@
 from gse.gol import *
-
+from gse.gutil import ObjGraph
 
 text = """Item1
     SubItem1 # this is a sub item
@@ -81,7 +81,8 @@ public void fn(n):
 """
 
 import pprint as pp
-gol = Gol(convert_fn, child_react=child_react_set_child, output_root_only = True)
+gr = ObjGraph()
+gol = Gol(gr, output_root_only = True)
 lines = text.splitlines()
 
 items = list(gol.load_gen(lines))

@@ -23,21 +23,6 @@ python -m gse.gui
 
 [Концепция](CONCEPT.md)
 
-## Встраивание GOL (Graph object language) в стороннее приложение
-
-```python
-from gse import gol  # Импортируйте модуль
-
-# Загрузите GOL-файл в программу:
-gol.load(file)
-print(gol.loads(text))
-
-# Сохраните GOL в файл:
-gol.dump(item, file)
-print(gol.dumps(item))
-
-```
-
 ## Инструменты получения данных из wikidata
 
 ### tut_wikidata_sparkql_superclasses
