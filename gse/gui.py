@@ -1,9 +1,9 @@
 import tkinter as tk
-<<<<<<< HEAD
+
 from tkinter import simpledialog
 from gse.gutil import ViewNode
 from gse.agraph import InboxValue
-=======
+
 from tkinter import (
     Frame,
     Label,
@@ -13,7 +13,7 @@ from tkinter import (
     simpledialog,
 )
 
->>>>>>> pr/6
+
 
 #TODO - item is view.
 """class Item:
@@ -70,15 +70,6 @@ class GraphToView:
                 print(" : " ,view_item, edge_type, view_item_children )
 
 
-<<<<<<< HEAD
-=======
-class gViewRechtPlaser:
-
-    def __init__(self):
-        pass
-    #TODO - copy plaser
->>>>>>> pr/6
-
 
 class App:
     def __init__(self, root):
@@ -104,9 +95,6 @@ class App:
         root.bind("<Shift-X>", self.on_shift_x_press)
         self.create_counter = 0
         #self.create_items()
-
-
-
 
     def _add_menubar(self):
         menubar = Menu(self.root)
@@ -378,18 +366,13 @@ class App:
             self.canvas.move(item.rect_id, dx, dy)
             self.canvas.move(item.text_id, dx, dy)
 
-<<<<<<< HEAD
+
 
             item.left += dx
             item.bottom += dy
             item.right += dx
             item.top += dy
-=======
-            item.x0 += dx
-            item.y0 += dy
-            item.x1 += dx
-            item.y1 += dy
->>>>>>> pr/6
+
             self.update_arrows(item)
             #self.canvas.coords(item.rect_id, item.x0,item.y0, item.x1, item.y1 )
             #self.canvas.coords(item.text_id, (item.x0 + item.x1) / 2, (item.y0 + item.y1) / 2,)
@@ -445,12 +428,7 @@ class App:
         self.create_counter+=1
         self.add_item_to_canvas(new_item)
 
-<<<<<<< HEAD
 
-
-
-=======
->>>>>>> pr/6
     def delete_item(self, item):
         print("delete_item: ", item)
         assert item.rect_id in self.items
