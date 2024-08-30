@@ -18,7 +18,7 @@ class DictGraph:
         else:
             node = value
         self.nodes[value] = node
-        return value
+        return node
 
     def get_value(self,node):
         if self.inbox:

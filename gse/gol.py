@@ -40,9 +40,11 @@ class Gol:
             item,indent = stack. pop()
             line = f'{indent}{get_value_fn(item)}\n'
             yield line
-            children = list(get_children_fn(item))
-            children.reverse()
+            children = get_children_fn(item)
+
             if children:
+                children =list(children)
+                children.reverse()
                 new_indent = f'{ident_symbol}{indent}'
                 for child in children:
                     stack.append((child,new_indent))

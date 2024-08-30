@@ -9,6 +9,9 @@ def loads(text,gtype = "dict"):
     """
     if gtype == "dict":
         graph = DictGraph()
+    elif gtype == "dict-":
+        graph = DictGraph()
+        graph.inbox = False
     elif gtype == "obj":
         graph = ObjGraph()
     else:
@@ -25,6 +28,9 @@ def load( file,gtype = "dict"):
     """
     if gtype == "dict":
         graph = DictGraph()
+    elif gtype == "dict-":
+        graph = DictGraph()
+        graph.inbox = False
     elif gtype == "obj":
         graph = ObjGraph()
     else:
