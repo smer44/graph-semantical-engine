@@ -1,25 +1,36 @@
 from gse.objgraph import ObjGraph
+from gse.dictgraph import DictGraph
 from gse.gol import Gol
 
-def loads(text):
+def loads(text,gtype = "dict"):
     """
     loads the graph object from the text
     :return graph, list of root nodes
     """
-    graph = ObjGraph()
-    gol = Gol(graph,output_root_only=True)
+    if gtype == "dict":
+        graph = DictGraph()
+    elif gtype == "obj":
+        graph = ObjGraph()
+    else:
+        raise ValueError(f"loads: unknown graph type: {gtype}")
 
+    gol = Gol(graph,output_root_only=True)
     return graph, [item for ctx, item in gol.load_gen(text.splitlines())]
 
 
-def load( file):
+def load( file,gtype = "dict"):
     """
     loads the text into the text file
     :return graph, list of root nodes
     """
-    graph = ObjGraph()
-    gol = Gol(graph,output_root_only=True)
+    if gtype == "dict":
+        graph = DictGraph()
+    elif gtype == "obj":
+        graph = ObjGraph()
+    else:
+        raise ValueError(f"loads: unknown graph type: {gtype}")
 
+    gol = Gol(graph,output_root_only=True)
     return graph, [item for ctx, item in gol.load_gen(file.readlines())]
 
 
