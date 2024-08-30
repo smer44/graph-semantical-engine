@@ -40,9 +40,11 @@ class Gol:
             item,indent = stack. pop()
             line = f'{indent}{get_value_fn(item)}\n'
             yield line
-            children = list(get_children_fn(item))
-            children.reverse()
+            children = get_children_fn(item)
+
             if children:
+                children =list(children)
+                children.reverse()
                 new_indent = f'{ident_symbol}{indent}'
                 for child in children:
                     stack.append((child,new_indent))
@@ -86,6 +88,7 @@ class Gol:
         child_react = self.child_react
         output_root_only = self.output_root_only
         graph = self.graph
+        known_lines = dict()
         for raw_line in lines:
             # Remove comments
             current_level, line = self.__line_to_level_line__(raw_line)
@@ -93,10 +96,15 @@ class Gol:
             pp(" - !! - current_level, line =" , current_level, line)
             if not line:
                 continue
-            if convert_fn:
-                item = convert_fn(line)
-            else:
-                item = line
+            #currently, i assign every same line to the same node.
+            #TODO - rename item to node
+            item =  known_lines.get(line, None)
+            if not item:
+                if convert_fn:
+                    item = convert_fn(line)
+                else:
+                    item = line
+                known_lines[line] = item
             #print("ctx  ", stack[-1], "level " , current_level)
             # Adjust stack based on indentation level
             if current_level > prev_indent:

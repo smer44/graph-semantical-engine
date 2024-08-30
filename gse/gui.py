@@ -1,4 +1,5 @@
 import tkinter as tk
+
 from tkinter import (
     Frame,
     Label,
@@ -9,14 +10,15 @@ from tkinter import (
 )
 
 
+
 #TODO - item is view.
-class Item:
-    def __init__(self, x0, y0, x1, y1, value,text):
-        self.x0 = x0
-        self.y0 = y0
-        self.x1 = x1
-        self.y1 = y1
-        self.text = text
+"""class Item:
+    def __init__(self, x0, y0, x1, y1, value):
+        self.left = x0
+        self.bottom = y0
+        self.right = x1
+        self.top = y1
+        #self.text = text
         self.value = value
         #self.selected = False
         self.rect_id = None
@@ -28,7 +30,8 @@ class Item:
         self.children_refs = dict()
 
     def __repr__(self):
-        return f"<!{self.rect_id}:{self.text}!>"
+        return f"<!{self.rect_id}:{self.value}!>"
+"""
 
 
 class GraphToView:
@@ -36,8 +39,8 @@ class GraphToView:
         self.add_edge = self.__add_edge_view_item__
         self.to_view_node = self.__to_view_item__
 
-    def __to_view_item__(self,object):
-        return Item(None,None,None,None,object,object.value)
+    #def __to_view_item__(self,object):
+    #    return Item(None,None,None,None,object,object.value)
 
     def __add_edge_view_item__(self,view_item_fro, edge_type, view_item_to ):
         row = view_item_fro.children_refs.setdefault(edge_type, set())
@@ -63,11 +66,7 @@ class GraphToView:
                 print(" : " ,view_item, edge_type, view_item_children )
 
 
-class gViewRechtPlaser:
 
-    def __init__(self):
-        pass
-    #TODO - copy plaser
 
 
 class App:
@@ -93,7 +92,7 @@ class App:
         #("<KeyPress-Shift_L>", shift_press)
         root.bind("<Shift-X>", self.on_shift_x_press)
         self.create_counter = 0
-        self.create_items()
+        #self.create_items()
 
     def _add_menubar(self):
         menubar = Menu(self.root)
@@ -155,6 +154,7 @@ class App:
             self.create_new_item(x,y)
 
     def create_arrow(self, from_item, to_item):
+        #print(f"{to_item=}, {to_item.rect_id=} , {from_item.children=}")
         if to_item.rect_id in from_item.children:
             assert from_item.rect_id in to_item.parents
             return
@@ -191,22 +191,22 @@ class App:
             self.canvas.coords(arrow_id, *coords)
 
     def calc_arrow_coords_4sided(self,fro,to):
-        fro_mid_x, fro_mid_y = (fro.x0 + fro.x1) / 2, (fro.y0 + fro.y1) / 2
-        to_mid_x, to_mid_y = (to.x0 + to.x1) / 2, (to.y0 + to.y1) / 2
+        fro_mid_x, fro_mid_y = (fro.left + fro.right) / 2, (fro.bottom + fro.top) / 2
+        to_mid_x, to_mid_y = (to.left + to.right) / 2, (to.bottom + to.top) / 2
         dx =fro_mid_x - to_mid_x
         dy = fro_mid_y - to_mid_y
         dx_abs = abs(dx)
         dy_abs = abs(dy)
         if dx_abs > dy_abs:
             if dx > 0 :
-                coords = fro.x0, fro_mid_y, to.x1, to_mid_y
+                coords = fro.left, fro_mid_y, to.right, to_mid_y
             else:
-                coords = fro.x1, fro_mid_y, to.x0, to_mid_y
+                coords = fro.right, fro_mid_y, to.left, to_mid_y
         else:
             if dy > 0:
-                coords = fro_mid_x, fro.y0,to_mid_x, to.y1
+                coords = fro_mid_x, fro.bottom,to_mid_x, to.top
             else:
-                coords = fro_mid_x, fro.y1, to_mid_x, to.y0
+                coords = fro_mid_x, fro.top, to_mid_x, to.bottom
         return coords
 
     def calc_arrow_coords(self,fro,to):
@@ -217,8 +217,8 @@ class App:
             return self.calc_arrow_line_coords(fro,to)
 
     def calc_arrow_line_coords(self,fro,to):
-        fro_mid_x, fro_mid_y = (fro.x0 + fro.x1) / 2, (fro.y0 + fro.y1) / 2
-        to_mid_x, to_mid_y = (to.x0 + to.x1) / 2, (to.y0 + to.y1) / 2
+        fro_mid_x, fro_mid_y = (fro.left + fro.right) / 2, (fro.bottom + fro.top) / 2
+        to_mid_x, to_mid_y = (to.left + to.right) / 2, (to.bottom + to.top) / 2
         dx =fro_mid_x - to_mid_x
         dy = fro_mid_y - to_mid_y
         dx_abs = abs(dx)
@@ -226,26 +226,24 @@ class App:
         y_mid =   (fro_mid_y + to_mid_y)//2
 
         if dy > 0:
-                coords = fro_mid_x, fro.y0, fro_mid_x,y_mid, to_mid_x,y_mid,  to_mid_x, to.y1
+                coords = fro_mid_x, fro.bottom, fro_mid_x,y_mid, to_mid_x,y_mid,  to_mid_x, to.top
         else:
-                coords = fro_mid_x, fro.y1,fro_mid_x, y_mid, to_mid_x, y_mid, to_mid_x, to.y0
+                coords = fro_mid_x, fro.top,fro_mid_x, y_mid, to_mid_x, y_mid, to_mid_x, to.bottom
         return coords
 
     def calc_arrow_loopback_coords(self,item):
         dx = 20
         dy = 10
-        mid_x, mid_y = (item.x0 + item.x1) / 2, (item.y0 + item.y1) / 2
+        mid_x, mid_y = (item.left + item.right) / 2, (item.bottom + item.top) / 2
 
-        coords = mid_x, item.y1, mid_x,item.y1+dy,item.x1+dx,item.y1+dy, item.x1+dx, mid_y, item.x1, mid_y,
+        coords = mid_x, item.top, mid_x, item.top + dy, item.right + dx, item.top + dy, item.right + dx, mid_y, item.right, mid_y,
         return coords
 
     def add_item_to_canvas(self, item):
-        rect_id = self.canvas.create_rectangle(item.x0, item.y0, item.x1, item.y1, outline='gray',width=2)
+        rect_id = self.canvas.create_rectangle(item.left,item.bottom,item.right,item.top, outline='gray', width=2)
         item.rect_id =rect_id
         #item.rect_id = self.canvas.create_rectangle(item.x0-2, item.y0-2, item.x1+2, item.y1+2, outline='gray', width=2)
-        item.text_id = self.canvas.create_text((item.x0 + item.x1) / 2, (item.y0 + item.y1) / 2, text=item.value)
-        #self.canvas.tag_bind(item.rect_id, '<Button-1>', lambda event, item=item: self.on_item_click(event, item))
-        #self.canvas.tag_bind(item.text_id, '<Button-1>', lambda event, item=item: self.on_item_click(event, item))
+        item.text_id = self.canvas.create_text((item.left + item.right) / 2, (item.bottom + item.top) / 2, text=item.value)
         self.items[rect_id]=item
 
     def deselect_all(self,exclude):
@@ -259,7 +257,7 @@ class App:
 
 
     def switch_item(self, item):
-        assert isinstance(item, Item), f"switch_item called with wrong key type : {type(item)=}"
+        assert isinstance(item, ViewNode), f"switch_item called with wrong key type : {type(item)=}"
 
         #print(f"switch_item called for {item}")
         id = item.rect_id
@@ -294,6 +292,7 @@ class App:
                     self.switch_item(self.items[child_id])
 
     def on_button_press(self, event):
+        print("on_button_press: event: ", event.state)
         item = self.find_closest_item(event.x, event.y)
         self.last_item = item
         self.last_event = event
@@ -365,10 +364,12 @@ class App:
             self.canvas.move(item.rect_id, dx, dy)
             self.canvas.move(item.text_id, dx, dy)
 
-            item.x0 += dx
-            item.y0 += dy
-            item.x1 += dx
-            item.y1 += dy
+
+            item.left += dx
+            item.bottom += dy
+            item.right += dx
+            item.top += dy
+
             self.update_arrows(item)
             #self.canvas.coords(item.rect_id, item.x0,item.y0, item.x1, item.y1 )
             #self.canvas.coords(item.text_id, (item.x0 + item.x1) / 2, (item.y0 + item.y1) / 2,)
@@ -399,27 +400,31 @@ class App:
 
     def find_closest_item(self, x, y):
         for item in self.items.values():
-            if item.x0 <= x <= item.x1 and item.y0 <= y <= item.y1:
+            #left,bottom,right,top = item.rect_id
+            if item.left <= x <= item.right and item.bottom <= y <= item.top:
                 return item
         return None
 
     def edit_text(self, event):
         item = self.find_closest_item(event.x, event.y)
         if item:
-            new_text = simpledialog.askstring("Input", "Edit text:", initialvalue=item.text)
+            new_text = simpledialog.askstring("Input", "Edit text:", initialvalue=str(item.value))
             if new_text:
-                item.text = new_text
-                self.canvas.itemconfig(item.text_id, text=new_text)
+                #item.text = new_text
+                item.value.set(new_text)
+                self.canvas.itemconfig(item.text_id, text=str(item.value))
 
     def create_new_item(self, x, y):
         print ("create_new_item: " , x, y )
         dx0,dy0,dx1,dy1 = -50,-25,50,25  # Define the size of the new item
         #print("create_new_item: items:" , self.items)#
-        text = f"New Item {self.create_counter}"
+        text_var = InboxValue(f"New Item {self.create_counter}")
         #TODO - this must be changed to creating a node out of text value
-        new_item = Item(x+dx0, y+dy0, x + dx1, y + dy1, text,text )
+        new_item = ViewNode(text_var)
+        new_item.set_coords(x+dx0, y+dy0, x + dx1, y + dy1)
         self.create_counter+=1
         self.add_item_to_canvas(new_item)
+
 
     def delete_item(self, item):
         print("delete_item: ", item)

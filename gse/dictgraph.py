@@ -1,22 +1,29 @@
-from agraph import dumps
+from gse.agraph import dumps, InboxValue
 
 class DictGraph:
 
     def __init__(self):
-        self.deepsizes = dict()
+        self.nodes = dict()
         self.edges_of_node = dict()
         self.node_edge_nodes = dict()
         self.node_node_edges = dict()
+        self.inbox = True
         self.dumps = lambda node: dumps(self,node)
 
 
     def new_node(self,value):
-        assert value not in self.deepsizes
-        self.deepsizes[value] = 0
-        return value
+        assert value not in self.nodes
+        if self.inbox:
+            node = InboxValue(value)
+        else:
+            node = value
+        self.nodes[value] = node
+        return node
 
-    def get_value(self,value):
-        return value
+    def get_value(self,node):
+        if self.inbox:
+            return node.value
+        return node
 
     def add_child(self,parent,child, edge= None):
         row = self.edges_of_node.setdefault(parent, set())
@@ -26,16 +33,7 @@ class DictGraph:
         row = self.node_node_edges.setdefault((parent, child), set())
         row.add(edge)
 
-    def reset_deepsize(self):
-        keys = list(self.deepsizes.keys())
-        for key in keys:
-            self.deepsizes[key] = 0
 
-    def deepsize(self,node):
-        return self.deepsizes[node]
-
-    def set_deepsize(self,node,value):
-        self.deepsizes[node] = value
 
     def children(self,node):
         edges = self.edges_of_node.get(node,None)
@@ -46,7 +44,8 @@ class DictGraph:
             ret.extend(self.node_edge_nodes[(node,edge)])
         return ret
 
-
+    def children_edge(self,node,edge):
+        return self.node_edge_nodes.get((node,edge), None)
 
 
 
