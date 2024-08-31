@@ -33,13 +33,13 @@ class DrawNode:
         line_height = 20  # Assuming a fixed line height for simplicity
 
         # Draw the class name box
-        self.canvas.create_rectangle(x, y, x + max_width+2 , y + line_height +2, fill="lightblue")
+        self.canvas.create_rectangle(x, y, x + max_width+2 , y + line_height +2, fill="light blue")
         self.canvas.create_text(x + max_width/2, y + line_height/2, anchor='center', text=class_name)
 
         # Draw the main rectangle with fields
         y += line_height
         rect_height = len(field_lines) * line_height
-        self.canvas.create_rectangle(x, y, x + max_width+2 , y + rect_height+2, fill="lightgreen")
+        self.canvas.create_rectangle(x, y, x + max_width+2 , y + rect_height+2, fill="LightCyan1")
 
         for i, line in enumerate(field_lines):
             self.canvas.create_text(x + 5, y + i * line_height + 5, anchor='nw', text=line)
