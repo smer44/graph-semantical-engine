@@ -1,26 +1,23 @@
 from gse.dictgraph import DictGraph
 from gse.gutil import ViewGraph
 from gse.agraph import dumps
-from gse import load
+from gse import loads
 from gse.examples.dummy_display import ViewNodeDummyDisplay
 
-#dummy graph:
-og = DictGraph()
+#load graph from string:
 
-root = og.new_node("root")
-a = og.new_node("a")
-b = og.new_node("b")
-ab = og.new_node("ab")
+#file = open("./load_me.txt", "r")
 
-og.add_child(root,a)
-og.add_child(root,b)
-og.add_child(a,ab)
-og.add_child(b,ab)
+text = """
+Living room
+    Sofa
+    TV
+Bedroom
+    Bed
+    Sofa
+"""
 
-#load graph from file:
-
-file = open("./load_me.txt", "r")
-og, roots = load(file)
+og, roots = loads(text)
 
 
 
@@ -30,13 +27,11 @@ vg.view_filter(og,roots,None,3)
 nodes = vg.nodes
 print("nodes:" , nodes)
 
-print(dumps(vg,vg.roots[0]))
 
-#vg.place(vg.roots, 10,20,800-10,600-20,3)
 
 vg.place_stretch_min(vg.roots, 10,20,800-10,600-20,3)
 vg.finalize_places()
-
+print(dumps(vg,vg.roots[0]))
 print(dumps(vg,vg.roots[1]))
 
 nodes = vg.nodes

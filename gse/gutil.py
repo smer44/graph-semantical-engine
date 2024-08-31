@@ -7,16 +7,17 @@ class ViewNode:
         self.value = node
         self.deepsize = 0
         self.depth = depth
-        self.top = 0
-        self.left = 0
-        self.bottom = 0
-        self.right = 0
+        self.top = None
+        self.left = None
+        self.bottom = None
+        self.right = None
         self.view_children = []
         self.view_parents = []
         self.roots_sum = 0
         #self.rect = None
         self.rect_id = None
         self.text_id = None
+        self.flags = 255
         self.children = dict()  # List to store pairs (rect_id, arrow_id) of children by given arrows
         self.parents = dict() # List to store pairs (rect_id, arrow_id) of parents by given arrows
 
@@ -75,7 +76,7 @@ class ViewGraph:
     #        self.add_child(viewnode, viewchild)
 
     def shallow_str(self, node):
-        if node.right > 0 :
+        if node.right is not None :
             return f"{node.value}#{node.left=},{node.bottom=},{node.right=},{node.top=}"
         else:
             return f"{node.value}#{node.deepsize},{node.depth}"
@@ -138,33 +139,141 @@ class ViewGraph:
         #self.top = my+ddy
         node.set_coords(mx-ddx, my-ddy,mx+ddx,my+ddy )
 
-    def place(self, roots, left,top,right,bottom,max_depth):
+    def correct_narrow(self, xmin):
+        for node in self.nodes:
+            if node.right - node.left < xmin:
+                node.right = node.left + xmin
+
+    def finalize_places(self):
+        for node in self.nodes:
+            self.finalize_bounds(node,node.left,node.bottom,node.right,node.top)
+
+    def place_stretch_min(self, roots, left,bottom,right,top, max_depth, xmin = 100):
+        dx = right - left
+        dy = top - bottom
+        xone_step = dx/self.roots_sum
+
+        for node in self.nodes:
+            node.deepsize = max(xmin, xone_step*node.deepsize)
+
+        #now, deepsize contains the scaled value.
+        #now, place nodes according to node_dx:
+
+        ystep = dy / (max_depth + 1)
+        root_top = bottom + ystep
+        global_left = left
+        stack = [(root, True) for root in roots]
+        for root in roots:
+            root.bottom = bottom
+            root.top = root_top
+        dejavu = set()
+        while stack:
+            node, first_time = stack.pop()
+            dejavu.add(node)
+            children = self.children(node)
+            if children:
+                children = list(children)
+                child_bottom = node.top
+                child_top = child_bottom + ystep
+                if first_time:
+                    # if we visit node in the first time:
+                    stack.append((node, False))
+                    children.reverse()
+                    for child in children:
+                        child.bottom = child_bottom
+                        child.top = child_top
+                        if child in dejavu:
+                            continue
+                        stack.append((child,True))
+
+                else:
+                    #if we visit node the second time, after its children is processed:
+
+                    if node.left is not None:
+                        continue
+                    #select first child not used for parent size:
+                    unused_child_id = None
+                    unused_child = None
+                    for (n,child) in enumerate(children):
+                        if child.flags == 255:
+                            unused_child_id = n
+                            unused_child = child
+                            break
+                    if unused_child_id is None:
+                        node.left = global_left
+                        global_left += node.deepsize
+                        node.right = global_left
+                    else:
+                        child_left = unused_child.left
+                        assert child_left is not None , f"visit second time {node=} with {children[0]=}, where child_left is None"
+                        ds = 0
+                        for child in children[unused_child_id:]:
+                            if child.flags == 255:
+                                child.flags = 0
+                                ds += child.deepsize
+                                child.flags = 0
+                        node.deepsize = ds
+                        #make sure that the most left is for the first child?
+                        node.left = child_left
+                        node.right = child_left+ds
+
+            else:
+                #if it is a node without children:
+                node.left = global_left
+                global_left+=node.deepsize
+                node.right = global_left
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    def place(self, roots, left,bottom,right,top,max_depth):
 
         dx = right - left
         dy = top - bottom
 
         xone_step = dx/self.roots_sum
+        print(f"{xone_step=}")
         yone_step = dy/(max_depth+1)
         sibling_left = left
         #xcell = xstep * (1.0 - 2*xborder)
         #ycell = ystep * (1.0 - 2*yborder)
+        min_xstep = 100
 
         stack = []
         root_top = bottom+yone_step
         for root in roots:
             left = sibling_left
-            step = xone_step * root.deepsize
+            step =  xone_step * root.deepsize
             sibling_left += step
             right = sibling_left
             #bottom = bottom
             top = root_top
-            stack.append((root,left,bottom))
+            stack.append((root,left,bottom,False))
             self.finalize_bounds(root,left,bottom,right,top)
 
         while stack :
-            node,child_left,child_bottom  = stack.pop()
+            node,child_left,child_bottom,to_finish  = stack.pop()
             children = self.children(node)
             if children:
+                if to_finish:
+                    child_min, child_max = 10000,-1
+                    for child in children:
+                        #if child.
+                        pass
+
                 child_bottom = child_bottom + yone_step
                 child_top = child_bottom + yone_step
                 for child in children:
@@ -173,14 +282,14 @@ class ViewGraph:
                         #TODO what to do with multiple parents?
                         # get the most left and most right value of a parent:
                         pass
-
+                    #check, if child is finished
                     left = child_left
                     step = xone_step * child.deepsize
                     child_left+=step
                     right = child_left
                     bottom = child_bottom
                     top = child_top
-                    stack.append((child,left,bottom))
+                    stack.append((child,left,bottom,False))
                     self.finalize_bounds(child,left,bottom,right,top)
 
 
