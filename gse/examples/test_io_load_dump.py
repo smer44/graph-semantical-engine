@@ -1,5 +1,5 @@
-from gse.gol import *
 from gse.objgraph import ObjGraph
+from gse.io import loads,dumps
 
 text = """Item1
     SubItem1 # this is a sub item
@@ -80,22 +80,16 @@ public void fn(n):
 
 """
 
-import pprint as pp
-gr = ObjGraph()
-gol = Gol(gr, output_root_only = True)
-lines = text.splitlines()
+def test_dictgraph_inbox():
+    graph, roots = loads(text)
+    #lines = text.splitlines()
 
-items = list(gol.load_gen(lines))
-for ctx, root in items:
-    print(root)
-    print(root.dumps())
-    #print(gol.dumps(root))
+    for root in roots:
+        print(f"---{type(root)=} {root=} ---")
+        print(dumps(graph,root))
+        #print(gol.dumps(root))
 
-#print("gol.loads:")
-#roots = gol.loads(text)
-
-#for root in roots:
-#    print(gol.dumps(root))
+test_dictgraph_inbox()
 
 """
 (None, <Project: <Planning: <Milestone1: <Task1>, <Task2>>, <Milestone2: <Task3>>>, <Development: <Phase1: <Task4>, <Task5>>, <Phase2: <Task6>>>>)

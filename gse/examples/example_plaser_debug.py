@@ -1,7 +1,7 @@
 from gse.dictgraph import DictGraph
 from gse.gutil import ViewGraph
-from gse import dumps
-from gse import loads
+from gse.io import dumps, loads
+
 from gse.examples.dummy_display import ViewNodeDummyDisplay
 
 #load graph from string:

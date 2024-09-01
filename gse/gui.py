@@ -100,12 +100,47 @@ class App:
         menubar = Menu(self.root)
         self.root.config(menu=menubar)
 
+        # file menu:
         file_menu = Menu(menubar)
-        file_menu.add_command(label='Сохранить', command=self._on_save_graph)
-        file_menu.add_command(label='Открыть', command=self._on_open_graph)
-        file_menu.add_command(label='Создать новый', command=self._on_new_graph)
+        file_menu.add_command(label='Save', command=self._on_save_graph)
+        file_menu.add_command(label='Open', command=self._on_open_graph)
+        file_menu.add_command(label='Create New ', command=self._on_new_graph)
+        menubar.add_cascade(label="File", menu=file_menu)
+        # edit menu:
 
-        menubar.add_cascade(label="Файл", menu=file_menu)
+
+
+        #help menu:
+        help_menu = Menu(menubar)
+        help_menu.add_command(label='Keymap', command=self._show_help_keymap)
+        menubar.add_cascade(label="Help", menu=help_menu)
+
+    def _show_help_keymap(self):
+        text = """
+        Left mouse click = select 
+        Shift + Left mouse clicks = select multiple        
+        
+        Ctrl + Left mouse click = create new node 
+        Alt + Left mouse click = delete node
+        
+        Right mouse click = select node for edge connection
+        Second right mouse click = connect two nodes with the 
+                                    edge
+        
+        Alt +  Left mouse click = delete the node
+        Alt +  Second right mouse click = delete edge between 
+                                            two nodes
+        
+        """
+        tk.messagebox.showinfo("Keymap", text)
+
+
+
+
+
+
+
+
 
     def _add_status_bar(self):
         frame = Frame(self.root)
@@ -245,7 +280,7 @@ class App:
         rect_id = self.canvas.create_rectangle(item.left,item.bottom,item.right,item.top, outline='gray', width=2)
         item.rect_id =rect_id
         #item.rect_id = self.canvas.create_rectangle(item.x0-2, item.y0-2, item.x1+2, item.y1+2, outline='gray', width=2)
-        item.text_id = self.canvas.create_text((item.left + item.right) / 2, (item.bottom + item.top) / 2, text=item.value)
+        item.text_id = self.canvas.create_text((item.left + item.right) / 2, (item.bottom + item.top) / 2, text=item.value.value)
         self.items[rect_id]=item
 
     def deselect_all(self,exclude):
@@ -286,9 +321,10 @@ class App:
         self.canvas.itemconfig(id, outline=outline)
 
     def on_shift_x_press(self,event):
-        #print("on_shift_x_press called")
+        print("on_shift_x_press: called")
         pairs = list(self.selected_items.items())
         for id, item in pairs:
+            #print(f"on_shift_x_press: selected pair: {id=}, {item=}")
             for child_id, arrow_id in item.children.items():
                 if child_id not in self.selected_items:
                     self.switch_item(self.items[child_id])

@@ -1,5 +1,5 @@
-
-class Gol:
+#!DEPRECATED
+class Gol_old:
     """
     Performs conversions of a graph data
     from strings to objects and backwards

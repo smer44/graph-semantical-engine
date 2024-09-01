@@ -10,7 +10,7 @@ class InboxValue:
         return hash(self.value)
 
     def __str__(self):
-        return str(self.value)
+        return f"|{str(self.value)}|"
 
     def __repr__(self):
-        return repr(self.value)
+        return f"|{repr(self.value)}|"
