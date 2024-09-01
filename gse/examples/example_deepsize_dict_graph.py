@@ -1,7 +1,7 @@
 from gse.gutil import *
-from gse.dictgraph import DictGraph
+#from gse.dictgraph import DictGraph
 
-og = DictGraph()
+og = ViewGraph()
 
 root = og.new_node("root")
 
@@ -34,7 +34,7 @@ print(og.dumps(root))
 
 print("Now, lets try cyclic graph, this also should produce reasonable size:")
 
-og = DictGraph()
+og = ViewGraph()
 
 root = og.new_node("root")
 

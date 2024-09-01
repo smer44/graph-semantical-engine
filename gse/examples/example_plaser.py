@@ -1,6 +1,6 @@
 from gse.dictgraph import DictGraph
 from gse.gutil import ViewGraph
-from gse.agraph import dumps
+from gse import dumps
 from gse import load
 from gse.examples.dummy_display import ViewNodeDummyDisplay
 

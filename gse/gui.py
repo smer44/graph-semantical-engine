@@ -2,7 +2,7 @@ import tkinter as tk
 
 from tkinter import simpledialog
 from gse.gutil import ViewNode
-from gse.agraph import InboxValue
+from gse.inbox import InboxValue
 
 from tkinter import (
     Frame,

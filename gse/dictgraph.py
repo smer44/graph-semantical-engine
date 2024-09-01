@@ -1,4 +1,5 @@
-from gse.agraph import dumps, InboxValue
+from gse.dump import dumps_indents
+from gse.inbox import InboxValue
 
 class DictGraph:
 
@@ -8,7 +9,9 @@ class DictGraph:
         self.node_edge_nodes = dict()
         self.node_node_edges = dict()
         self.inbox = True
-        self.dumps = lambda node: dumps(self,node)
+        self.dumps = lambda node: dumps_indents(node,
+                                                self.children,
+                                                )
 
 
     def new_node(self,value):

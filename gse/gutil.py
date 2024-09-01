@@ -1,4 +1,4 @@
-
+from gse.dump import dumps_indents
 
 
 class ViewNode:
@@ -39,6 +39,7 @@ class ViewGraph:
 
     def __init__(self):
         self.nodes = []
+        self.dumps = lambda node : "".join(dumps_indents(node,self.children))
         #self.roots = []
 
     def new_node(self,value,depth = 0):
