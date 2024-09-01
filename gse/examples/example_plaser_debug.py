@@ -45,12 +45,7 @@ import tkinter as tk
 
 root = tk.Tk()
 app = App(root)
-for vnode in nodes:
-    app.add_item_to_canvas(vnode)
-    #print("recht_id children: ", vnode.children)
-for vnode in nodes:
-    for child in vg.children(vnode):
-        app.create_arrow(vnode,child)
+app.add_nodes(vg,nodes)
 root.mainloop()
 
 

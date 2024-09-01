@@ -3,6 +3,8 @@ import tkinter as tk
 from tkinter import simpledialog
 from gse.gutil import ViewNode
 from gse.inbox import InboxValue
+from gse.io import load
+from gse.gutil import ViewGraph
 
 from tkinter import (
     Frame,
@@ -173,7 +175,15 @@ class App:
         file_name_graph = filedialog.askopenfilename(filetypes=(('TXT files', '*.txt'), ('YAML files', '*.yaml')))
         if file_name_graph:
             with open(file_name_graph, 'r', encoding='utf-8') as file_graph:
-                pass
+                #TODO currently, loading pure graph and then creates a viewgraph
+                og, roots = load(file_graph)
+                vg = ViewGraph()
+                vg.view_filter(og, roots, None, 4)
+
+
+                vg.place_stretch_min(vg.roots, 10, 20, 800 - 10, 600 - 20, 3)
+                vg.finalize_places()
+                self.add_nodes(vg, vg.nodes)
 
             self.file_name_graph = file_name_graph
             self._print_to_filename_bar(file_name_graph)
@@ -277,6 +287,8 @@ class App:
         return coords
 
     def add_item_to_canvas(self, item):
+        #print(f"add_item_to_canvas : Left: {item.left}, Bottom: {item.bottom}, Right: {item.right}, Top: {item.top}")
+
         rect_id = self.canvas.create_rectangle(item.left,item.bottom,item.right,item.top, outline='gray', width=2)
         item.rect_id =rect_id
         #item.rect_id = self.canvas.create_rectangle(item.x0-2, item.y0-2, item.x1+2, item.y1+2, outline='gray', width=2)
@@ -487,6 +499,15 @@ class App:
             self.canvas.delete(arrow_id)
             other_item = self.items[rect_id]
             del other_item.children[item.rect_id]
+
+    def add_nodes(self,viewgraph,nodes):
+        for vnode in nodes:
+            self.add_item_to_canvas(vnode)
+            # print("recht_id children: ", vnode.children)
+        for vnode in nodes:
+            for child in viewgraph.children(vnode):
+                self.create_arrow(vnode, child)
+
 
 
 def run():
