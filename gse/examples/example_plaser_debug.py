@@ -1,6 +1,6 @@
 from gse.dictgraph import DictGraph
 from gse.gutil import ViewGraph
-from gse.io import dumps, loads
+from gse.gio import dumps, loads
 
 from gse.examples.dummy_display import ViewNodeDummyDisplay
 
@@ -45,7 +45,7 @@ import tkinter as tk
 
 root = tk.Tk()
 app = App(root)
-app.add_nodes(vg,nodes)
+app.canvas.add_nodes(vg,nodes)
 root.mainloop()
 
 

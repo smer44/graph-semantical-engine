@@ -1,7 +1,7 @@
 from gse.dictgraph import DictGraph
 from gse.gutil import ViewGraph
-from gse.io import dumps
-from gse.io import load
+from gse.gio import dumps, load
+
 from gse.examples.dummy_display import ViewNodeDummyDisplay
 
 #dummy graph:
@@ -51,11 +51,11 @@ import tkinter as tk
 root = tk.Tk()
 app = App(root)
 for vnode in nodes:
-    app.add_item_to_canvas(vnode)
+    app.canvas.add_item_to_canvas(vnode)
     #print("recht_id children: ", vnode.children)
 for vnode in nodes:
     for child in vg.children(vnode):
-        app.create_arrow(vnode,child)
+        app.canvas.create_arrow(vnode,child)
 root.mainloop()
 
 
