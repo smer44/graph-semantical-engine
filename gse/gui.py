@@ -143,6 +143,7 @@ class App:
 
                 vg.place_stretch_min(vg.roots, 10, 20, 800 - 10, 600 - 20, 3)
                 vg.finalize_places()
+                self.canvas.delete_all()
                 self.canvas.add_nodes(vg, vg.nodes)
 
             self.file_name_graph = file_name_graph

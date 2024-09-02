@@ -398,3 +398,9 @@ class GraphCanvas(Canvas):
                 self.create_arrow(vnode, child)
 
 
+    def delete_all(self):
+        self.delete("all")
+        #self.configure(bg='white')
+        self.selected_items = dict()
+        self.selected_for_connect = None
+        self.items = dict()
