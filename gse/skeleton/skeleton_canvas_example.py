@@ -1,6 +1,46 @@
 import tkinter as tk
 from  math import radians , atan2,sqrt, sin, cos
 
+class NodeDrawer:
+
+    def __init__(self):
+        pass
+
+
+    def redraw_shallow(self,canvas, node):
+        r = node.r
+        # print(f'redraw {node=}')
+        if node.disp_item == None:
+            node.disp_item = canvas.create_oval(
+                node.x - r, node.y - r, node.x + r, node.y + r, fill="black"
+            )
+        else:
+            canvas.moveto(node.disp_item, node.x - r, node.y - r)
+        fill = ["black", "blue"][node.selected]
+        canvas.itemconfig(node.disp_item, fill=fill)
+
+
+
+    def redraw_parent_line(self,canvas,node):
+        if node.parent:
+            parent = node.parent
+            if node.line_from_parent == None:
+                node.line_from_parent = canvas.create_line(parent.x, parent.y, node.x, node.y)
+            else:
+                canvas.coords(node.line_from_parent, parent.x, parent.y, node.x, node.y)
+
+    def redraw_shallow_lines(self, canvas, node):
+        self.redraw_shallow(canvas,node)
+        self.redraw_parent_line(canvas, node)
+        for child in node.children:
+            self.redraw_parent_line(canvas, child)
+
+    def redraw_deep(self, canvas, node):
+        self.redraw_parent_line(canvas, node)
+        self.redraw_shallow(canvas,node)
+        for child in node.children:
+            self.redraw_deep(canvas,child)
+
 class SceletonNode:
     _id_counter = 0
 
@@ -15,6 +55,7 @@ class SceletonNode:
         self.r = 10
         self.selected = False
         self.unmovable = False
+
 
 
         SceletonNode._id_counter += 1
@@ -54,6 +95,7 @@ class SceletonCanvas(tk.Canvas):
         self.selected_node = None
         self.drag_data = {"item": None}
         self.add_chain = True
+        self.drawer = NodeDrawer()
 
     def on_mouse_wheel(self, event):
         if self.selected_node:
@@ -64,8 +106,7 @@ class SceletonCanvas(tk.Canvas):
                 if event.delta < 0 :
                     angle_delta = -angle_delta
                 self.rotate_node(parent, child, angle_delta )
-                self.redraw_parent_line(child)
-                self.redraw_deep(child)
+                self.drawer.redraw_shallow_lines(self,child)
 
     def on_mouse_wheel_deep(self, event):
         if self.selected_node:
@@ -76,8 +117,7 @@ class SceletonCanvas(tk.Canvas):
                 if event.delta < 0:
                     angle_delta = -angle_delta
                 self.rotate_deep(parent, child, angle_delta)
-                self.redraw_parent_line(child)
-                self.redraw_deep(child)
+                self.drawer.redraw_deep(self,child)
 
     def rotate_deep(self,parent,child,angle_delta):
         self.rotate_node(parent, child, angle_delta)
@@ -153,7 +193,7 @@ class SceletonCanvas(tk.Canvas):
                         by_coords[(x, y)] = child
                     parent.add_child(child)
         self.nodes.update(by_coords.values())
-        self.redraw_deep(self.skeleton_root)
+        self.drawer.redraw_deep(self,self.skeleton_root)
 
 
 
@@ -181,8 +221,8 @@ class SceletonCanvas(tk.Canvas):
             self.move(node.disp_item, dx, dy)
             node.x = event.x
             node.y = event.y
-            self.redraw_parent_line(node)
-            self.redraw_deep(node)
+            #self.redraw_parent_line(node)
+            self.drawer.redraw_shallow_lines(self,node)
 
 
 
@@ -200,8 +240,8 @@ class SceletonCanvas(tk.Canvas):
             dx = event.x - node.x
             dy = event.y - node.y
             self.deep_move(node,dx,dy)
-            self.redraw_parent_line(node)
-            self.redraw_deep(node)
+            #self.redraw_parent_line(node)
+            self.drawer.redraw_deep(self,node)
 
 
 
@@ -222,12 +262,12 @@ class SceletonCanvas(tk.Canvas):
             self.nodes.add(new_node)
             self.skeleton_root = new_node
             self.select(new_node)
-            self.redraw(self.selected_node)
+            self.redraw_shallow(self.selected_node)
         elif self.selected_node:
             new_node = SceletonNode(x, y)
             self.nodes.add(new_node)
             self.selected_node.add_child(new_node)
-            self.redraw(self.selected_node)
+            self.redraw_shallow(self.selected_node)
             if self.add_chain:
                 self.select(new_node)
 
@@ -271,11 +311,6 @@ class SceletonCanvas(tk.Canvas):
             self.delete(child.line_from_parent)
             self.clear_display_deep(child)
 
-    def redraw_parent_line(self,child):
-        if child.line_from_parent:
-            x,y,w,u = self.coords(child.line_from_parent)
-            self.coords(child.line_from_parent, x, y, child.x, child.y)
-
 
     def redraw_shallow(self,node):
         r = node.r
@@ -289,15 +324,15 @@ class SceletonCanvas(tk.Canvas):
         fill = ["black","blue"][node.selected]
         self.itemconfig(node.disp_item,fill =fill)
 
-    def redraw_deep(self, node):
-        self.redraw_shallow(node)
-
-        for child in node.children:
-            if child.line_from_parent == None:
-                child.line_from_parent = self.create_line(node.x, node.y, child.x, child.y)
+        if node.parent:
+            parent = node.parent
+            if node.line_from_parent == None:
+                node.line_from_parent = self.create_line(parent.x, parent.y, node.x, node.y)
             else:
-                self.coords(child.line_from_parent, node.x, node.y, child.x, child.y)
-            self.redraw_deep(child)
+                self.coords(node.line_from_parent, parent.x, parent.y, node.x, node.y)
+
+
+
 
 
 
