@@ -1,17 +1,18 @@
 from tkinter import Canvas, simpledialog, BOTH,LAST
 from gse.inbox import InboxValue
-from gse.gutil import ViewNode
+from gse.gutil import ViewNode, ViewGraph
 from gse.gCanvasObjItemRender import gCanvasStringItemRenderer
 from gse.gitemovalrenderer import gCanvasStringOvalItemRenderer
 from gse.gitemclzrenderer import gCanvasClzItemRenderer
 class GraphCanvas(Canvas):
     def __init__(self,tk_root,width,height):
-        super().__init__(tk_root, width=width, height=height,bg='white')
+        super().__init__(tk_root,  width=width, height=height,bg='white')
         self.pack(fill=BOTH, expand=True)
         self.selected_items = dict()
         self.selected_for_connect = None
         self.items = dict()
         self.drag_data = {"x": 0, "y": 0}
+        self.viewgraph = None
         self.renderer = gCanvasClzItemRenderer()
         self.bind("<ButtonPress-1>", self.on_button_press)
         self.bind("<B1-Motion>", self.on_mouse_drag)
@@ -124,9 +125,6 @@ class GraphCanvas(Canvas):
 
 
     def add_item_to_canvas(self, item):
-        #print(f"add_item_to_canvas : Left: {item.left}, Bottom: {item.bottom}, Right: {item.right}, Top: {item.top}")
-        #assert item.left is not None and item.bottom is not None and item.right is not None and item.top is not None
-        #item.text_id = self.create_text((item.left + item.right) / 2, (item.bottom + item.top) / 2, text=item.value.value)
         self.renderer.create_visual_item(self,item)
         self.items[item.rect_id]=item
 
@@ -299,12 +297,17 @@ class GraphCanvas(Canvas):
 
     #TODO - this should be removed to some creator:
     def create_new_item(self, x, y):
+        #assert self.viewgraph is not None, f"{type(self).__name__}.create_new_item : called with graph not set"
+        if self.viewgraph is None:
+            self.viewgraph = ViewGraph()
         print ("create_new_item: " , x, y )
         dx0,dy0,dx1,dy1 = -50,-25,50,25  # Define the size of the new item
         #print("create_new_item: items:" , self.items)#
-        text_var = InboxValue(f"New Item {self.create_counter}")
+        #text_var = InboxValue(f"New Item {self.create_counter}")
         #TODO - this must be changed to creating a node out of text value
-        new_item = ViewNode(text_var)
+        value = f"New Item {self.create_counter}"
+        new_item = self.viewgraph.new_inboxed_node(value)
+
         new_item.set_coords(x+dx0, y+dy0, x + dx1, y + dy1)
         self.create_counter+=1
         self.add_item_to_canvas(new_item)
@@ -383,7 +386,9 @@ class GraphCanvas(Canvas):
 
 
 
-    def add_nodes(self,viewgraph,nodes):
+    def reset_graph(self,viewgraph):
+        nodes = viewgraph.nodes
+        self.viewgraph = viewgraph
         for vnode in nodes:
             self.add_item_to_canvas(vnode)
             # print("recht_id children: ", vnode.children)

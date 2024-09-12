@@ -5,7 +5,7 @@ class gCanvasClzItemRenderer:
 
 
     def __init__(self):
-        self.shown_fields = set(["value"])
+        self.shown_fields = set(["value","id"])
         self.header_height = 16
 
 
@@ -28,31 +28,36 @@ class gCanvasClzItemRenderer:
         hright = item.right -1
         htop = item.bottom + self.header_height-1
 
-        header_rect_id = canvas.create_rectangle(hleft, hbot, hright, htop, outline='gray', width=1)
+        #header_rect_id = canvas.create_rectangle(hleft, hbot, hright, htop, outline='gray', width=1)
+
+        #header_line_id = canvas.create_line(hleft, htop, hright, htop,fill='gray', width=1)
         header_text_id = canvas.create_text((hleft + hright) / 2, (hbot + htop) / 2,
                                         text=header_str)
 
         rect_id = canvas.create_rectangle(item.left, item.bottom, item.right, item.top, outline='gray', width=2)
         item.rect_id = rect_id
-
-        step = (htop - item.bottom) // len(self.shown_fields)
+        htop +=2
+        step = (item.top - htop) // len(self.shown_fields)
         step_half = step//2
-        text_mid_x = (item.left + item.right) // 2
+        #text_mid_x = (item.left + item.right) // 2
         text_name_x = (item.left + item.left +item.left +item.right) // 4
         text_value_x = (item.left + item.right+ item.right+ item.right) // 4
         text_bot = htop+step_half
 
         item.__setattr__("visuals",list())
-        item.visuals.append(header_rect_id)
+        #item.visuals.append(header_line_id)
         item.visuals.append(header_text_id)
 
         for field_name in self.shown_fields:
             value = getattr(item.value,field_name)
             field_name_id = canvas.create_text(text_name_x,text_bot, text=field_name)
             field_value_id = canvas.create_text(text_value_x, text_bot, text=value)
+            line_before_field_id = canvas.create_line(hleft, htop, hright, htop,fill='gray', width=1)
             item.visuals.append(field_name_id)
             item.visuals.append(field_value_id)
+            item.visuals.append(line_before_field_id)
             text_bot =  text_bot+step
+            htop += step
 
 
     def update_color(self,canvas, item, is_selected,is_selected_for_connect):

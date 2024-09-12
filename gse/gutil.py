@@ -1,6 +1,6 @@
 from gse.dump import dumps_indents
 from gse.inbox import InboxValue
-
+from gse.inboxcounter import InboxCounterValue
 class ViewNode:
 
     def __init__(self,node,depth = 0):
@@ -48,8 +48,8 @@ class ViewGraph:
         return node
 
     def new_inboxed_node(self,value,depth=0):
-        value = InboxValue(value)
-        self.new_node(value,depth)
+        value = InboxCounterValue(value)
+        return self.new_node(value,depth)
 
 
 
