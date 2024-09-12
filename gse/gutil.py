@@ -1,5 +1,5 @@
 from gse.dump import dumps_indents
-
+from gse.inbox import InboxValue
 
 class ViewNode:
 
@@ -46,6 +46,12 @@ class ViewGraph:
         node = ViewNode(value,depth)
         self.nodes.append(node)
         return node
+
+    def new_inboxed_node(self,value,depth=0):
+        value = InboxValue(value)
+        self.new_node(value,depth)
+
+
 
     def get_value(self,node):
         return node

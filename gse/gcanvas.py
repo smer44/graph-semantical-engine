@@ -1,7 +1,9 @@
 from tkinter import Canvas, simpledialog, BOTH,LAST
 from gse.inbox import InboxValue
 from gse.gutil import ViewNode
-
+from gse.gCanvasObjItemRender import gCanvasStringItemRenderer
+from gse.gitemovalrenderer import gCanvasStringOvalItemRenderer
+from gse.gitemclzrenderer import gCanvasClzItemRenderer
 class GraphCanvas(Canvas):
     def __init__(self,tk_root,width,height):
         super().__init__(tk_root, width=width, height=height,bg='white')
@@ -10,7 +12,7 @@ class GraphCanvas(Canvas):
         self.selected_for_connect = None
         self.items = dict()
         self.drag_data = {"x": 0, "y": 0}
-
+        self.renderer = gCanvasClzItemRenderer()
         self.bind("<ButtonPress-1>", self.on_button_press)
         self.bind("<B1-Motion>", self.on_mouse_drag)
         self.bind("<ButtonRelease-1>", self.on_button_release)
@@ -47,7 +49,6 @@ class GraphCanvas(Canvas):
         from_item.children[to_item.rect_id] = arrow_id
         to_item.parents[from_item.rect_id] = arrow_id
         #print("line created : ",  from_item, to_item)
-
 
 
     def delete_arrow(self,from_item, to_item):
@@ -125,13 +126,9 @@ class GraphCanvas(Canvas):
     def add_item_to_canvas(self, item):
         #print(f"add_item_to_canvas : Left: {item.left}, Bottom: {item.bottom}, Right: {item.right}, Top: {item.top}")
         #assert item.left is not None and item.bottom is not None and item.right is not None and item.top is not None
-        assert isinstance(item.left,(int,float)) and isinstance(item.bottom,(int,float)) and \
-               isinstance(item.right,(int,float)) and isinstance(item.top,(int,float))
-        rect_id = self.create_rectangle(item.left,item.bottom,item.right,item.top, outline='gray', width=2)
-        item.rect_id =rect_id
-        #item.rect_id = self.create_rectangle(item.x0-2, item.y0-2, item.x1+2, item.y1+2, outline='gray', width=2)
-        item.text_id = self.create_text((item.left + item.right) / 2, (item.bottom + item.top) / 2, text=item.value.value)
-        self.items[rect_id]=item
+        #item.text_id = self.create_text((item.left + item.right) / 2, (item.bottom + item.top) / 2, text=item.value.value)
+        self.renderer.create_visual_item(self,item)
+        self.items[item.rect_id]=item
 
 
 
@@ -158,18 +155,9 @@ class GraphCanvas(Canvas):
 
     def update_color(self,item):
         id = item.rect_id
-        if id in self.selected_items:
-            if self.selected_for_connect is not None and id == self.selected_for_connect.rect_id:
-                outline = "purple"
-            else:
-                outline = "blue"
-        else:
-            if self.selected_for_connect is not None and id == self.selected_for_connect.rect_id:
-                outline = "red"
-            else:
-                outline = "gray"
-
-        self.itemconfig(id, outline=outline)
+        is_selected = id in self.selected_items
+        is_selected_for_connect = self.selected_for_connect is not None and id == self.selected_for_connect.rect_id
+        self.renderer.update_color(self,item,is_selected, is_selected_for_connect)
 
 
     def on_shift_x_press(self,event):
@@ -255,8 +243,8 @@ class GraphCanvas(Canvas):
         for item in items:
             dx = event.x - self.drag_data["x"]
             dy = event.y - self.drag_data["y"]
-            self.move(item.rect_id, dx, dy)
-            self.move(item.text_id, dx, dy)
+
+            self.renderer.move_visual_item(self,item,dx, dy)
 
             item.left += dx
             item.bottom += dy
@@ -306,9 +294,7 @@ class GraphCanvas(Canvas):
         if item:
             new_text = simpledialog.askstring("Input", "Edit text:", initialvalue=str(item.value))
             if new_text:
-                #item.text = new_text
-                item.value.set(new_text)
-                self.itemconfig(item.text_id, text=str(item.value))
+                self.renderer.update_text_on_item(self,item,new_text)
 
 
     #TODO - this should be removed to some creator:
@@ -327,16 +313,24 @@ class GraphCanvas(Canvas):
     def delete_item(self, item):
         print("delete_item: ", item)
         assert item.rect_id in self.items
+        # if this is currently selected item for connect, remove selected_for_connect item
+        if self.selected_for_connect is not None and  item.rect_id == self.selected_for_connect.rect_id:
+            #print(f"removed {item.rect_id} from self.selected_for_connect")
+            self.selected_for_connect = None
+        #if this item is in selection, remove it from selection:
+            if item.rect_id in self.selected_items:
+                #print(f"removed {item.rect_id} from selected_items")
+                del self.selected_items[item.rect_id]
+
+
         # Remove item from canvas
-        self.delete(item.rect_id)
-        self.delete(item.text_id)
+        self.renderer.delete_visual_item(self,item)
         #Remove all arrows from and to this item:
         self.delete_arrows(item)
         # Remove item from items list
         if item.rect_id in self.selected_items:
             del self.selected_items[item.rect_id]
             del self.items[item.rect_id]
-
 
     def delete_arrows(self,item):
         for rect_id, arrow_id in item.children.items():
