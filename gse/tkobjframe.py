@@ -17,12 +17,11 @@ class StrToValueConverter:
 
     def fromstr(self, value):
         try:
-            return float(value)
+            return int(value)
         except ValueError:
             pass
-
         try:
-            return int(value)
+            return float(value)
         except ValueError:
             pass
 
@@ -87,7 +86,7 @@ class ObjectDisplayFrame(tk.Frame):
         print(f"Object of type: {self.obj.__class__.__name__}")
         for field in self.displayed_fields:
             value = getattr(self.obj, field)
-            print(f"{field}: {value}")
+            print(f"{field}: {value.__class__.__name__}: {value}")
 
 class ObjectFieldDisplayFrame(tk.Frame):
 
@@ -123,7 +122,7 @@ class ObjectFieldDisplayFrame(tk.Frame):
         value_entry = tk.Entry(self, textvariable=value_var)
         value_entry.pack(side=tk.LEFT,fill = tk.BOTH, padx=5)
         value_entry.bind("<Return>", self.update_field_value)
-        value_entry.bind("<KeyRelease>", self.update_field_name)
+        value_entry.bind("<KeyRelease>", self.update_field_value)
 
     def update_field_name(self, event):
         if not self.is_immutable:
@@ -136,7 +135,7 @@ class ObjectFieldDisplayFrame(tk.Frame):
                 else:
                     self.master.warning_label.config(text="")
                     self.field_name = new_field_name
-                    field_value = self.value_var.get().strip()
+                    field_value = self.converter.fromstr(self.value_var.get().strip())
                     delattr(self.obj, old_field_name)
                     setattr(self.obj, new_field_name, field_value)
 
@@ -144,8 +143,8 @@ class ObjectFieldDisplayFrame(tk.Frame):
 
 
     def update_field_value(self, event):
-        #print(" !! update_field_value")
-        new_value = self.value_var.get().strip()
+        print(" !! update_field_value")
+        new_value = self.converter.fromstr(self.value_var.get().strip())
         field_name = self.name_var.get().strip()
         if field_name == self.field_name:
             setattr(self.obj, self.field_name, new_value)
