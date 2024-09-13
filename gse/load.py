@@ -22,7 +22,7 @@ def loads_parent_children(lines,
                 children_raw = children.strip()
                 assert children_raw
                 known_parent = known_values.get(parent,None)
-                if known_parent:
+                if known_parent is not None:
                     parent = known_parent
                 else:
                     if inbox_fn:
@@ -129,6 +129,8 @@ def loads_indents(lines,
                 yield ctx, item
         else:
             if output_root_only:
+                yield item
+            else:
                 yield ctx, item
 
         # Update previous indentation level

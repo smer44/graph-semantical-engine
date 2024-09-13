@@ -17,25 +17,6 @@ class ObjNode:
             return f"<{self.value}>"
         #return f"<{self.value}#{self.id}:  {self.children}>"
 
-    def dumps(self, indent="",ident_symbol = "\t"):
-        stack = [(self, indent)]
-        output_lines = []
-        dejavu = set()
-        while stack:
-            node, indent = stack.pop()
-            if node in dejavu:
-                continue
-            dejavu.add(node)
-            line = f'{indent}{node.value}#{node.deepsize}\n'
-            output_lines.append(line)
-            children = list(node.children)
-            if children:
-                children.reverse()
-                new_indent = f'{ident_symbol}{indent}'
-                for child in children:
-                    stack.append((child,new_indent))
-        return "".join(output_lines)
-
     def add_child(self,child):
         self.children.append(child)
 

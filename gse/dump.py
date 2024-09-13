@@ -47,6 +47,7 @@ def dumps_indents(root,
 
         children = children_fn(node)
         if children:
+            children = list(children)
             children.reverse()
             new_indent = f'{ident_symbol}{indent}'
             for child in children:
