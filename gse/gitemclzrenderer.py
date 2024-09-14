@@ -5,7 +5,7 @@ class gCanvasClzItemRenderer:
 
 
     def __init__(self):
-        self.shown_fields = set(["value","id"])
+        self.shown_fields = set(["value"])
         self.header_height = 16
 
 

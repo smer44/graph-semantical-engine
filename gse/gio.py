@@ -45,8 +45,10 @@ def load_lines(lines,format = "indents", gtype = "dict"):
     else:
         raise ValueError(f"loads: unknown format: {format}")
 
-
-    return graph, [item for ctx, item in load_fn(lines,**kwargs)]
+    #if kwargs["output_root_only"]:
+    #    return graph, [item for item in load_fn(lines,**kwargs)]
+    # else:
+    return graph, [item for item in load_fn(lines, **kwargs)]
 
 
 

@@ -19,6 +19,7 @@ place
 
 
 
+#TODO - need special dump what does not go deeper lvl 2
 
 def load_entities(text):
     eg = EntityGraph()
