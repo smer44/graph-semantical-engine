@@ -5,8 +5,12 @@ def loads_parent_children(lines,
                          commentchr = "#",
                          inverse = False,
                          output_root_only = False,
-                         child_react = None):
-    known_values = dict()
+                         child_react = None,
+                         values_to_nodes_dict = None):
+    if values_to_nodes_dict is None:
+        values_to_nodes_dict = dict()
+
+
     known_children = set()
     line_counter = 0
     for raw_line in lines:
@@ -16,50 +20,51 @@ def loads_parent_children(lines,
             if line:
                 parent_children_split = line.split(splitchr)
                 assert len(parent_children_split) == 2
-                parent, children = parent_children_split
-                parent = parent.strip()
-                assert parent
+                parent_value, children = parent_children_split
+                parent_value = parent_value.strip()
+                assert parent_value
                 children_raw = children.strip()
                 assert children_raw
-                known_parent = known_values.get(parent,None)
-                if known_parent is not None:
-                    parent = known_parent
-                else:
+
+                parent = values_to_nodes_dict.get(parent_value,None)
+                if parent is  None:
                     if inbox_fn:
-                        value = inbox_fn(parent)
+                        parent = inbox_fn(parent_value)
                     else:
-                        value = parent
-                    known_values[parent] = value
-                    #roots[parent] = value
-                    parent = value
-                    #print(roots)
+                        parent = parent_value
+                    values_to_nodes_dict[parent_value] = parent
+
 
                 for child_raw in children_raw.split(komma):
-                    child = child_raw.strip()
-                    if child:
-                        known_child = known_values.get(child, None)
-                        if known_child:
-                            child = known_child
-                        else:
-                            known_children.add(child)
+                    child_value = child_raw.strip()
+                    if child_value:
+                        child = values_to_nodes_dict.get(child_value,None)
+                        if child is None:
                             if inbox_fn:
-                                child = inbox_fn(child)
-                        if not output_root_only:
-                            if inverse:
-                                if child_react:
-                                    child_react(child,parent)
-                                yield child, parent
+                                child = inbox_fn(child_value)
                             else:
-                                if child_react:
-                                    child_react(parent,child)
+                                child = child_value
+                        values_to_nodes_dict[child_value] = child
+
+                        if inverse:
+                            known_children.add(parent_value)
+                            if child_react:
+                                child_react(child,parent)
+                            if not output_root_only:
+                                yield child, parent
+                        else:
+                            known_children.add(child_value)
+                            if child_react:
+                                child_react(parent,child)
+                            if not output_root_only:
                                 yield parent, child
         line_counter +=1
     if output_root_only:
         print(f"{known_children=}")
-        roots = known_values.keys() - known_children
+        roots = values_to_nodes_dict.keys() - known_children
         #at last , yield only roots:
         for root in roots:
-            yield None, known_values[root]
+            yield  values_to_nodes_dict[root]
 
 
 
@@ -90,12 +95,13 @@ def loads_indents(lines,
     for raw_line in lines:
         # Remove comments
         current_level, line = __line_to_level_line__(raw_line, commentchr)
-        assert current_level%alignment == 0, f"yLinesToObjectsByIndents.__iter__ : wrong indent {current_level} for {alignment=} for line = '{raw_line}'"
-        #print(" - !! - current_level, line =" , current_level, line)
         if not line:
             continue
+        assert current_level%alignment == 0, f"loads_indents : wrong indent {current_level} for {alignment=} for line = '{raw_line}'"
+        #print(" - !! - current_level, line =" , current_level, line)
+
         #currently, i assign every same line to the same node.
-        #TODO - rename item to node
+
         item =  known_lines.get(line, None)
         if not item:
             if inbox_fn:
@@ -136,6 +142,46 @@ def loads_indents(lines,
         # Update previous indentation level
         prev_item  = item
         prev_indent = current_level
+
+
+def load_one_indent(lines,
+                    inbox_fn,
+                    commentchr = "#",
+                    alignment = 4,
+                    output_root_only = False,
+                    child_react = None):
+    known_lines = dict()
+    last_item = None
+    for raw_line in lines:
+        current_level, line = __line_to_level_line__(raw_line, commentchr)
+        if not line:
+            continue
+        assert current_level == 0 or current_level == alignment and last_item is not None, f"load_one_indent : wrong indent {current_level} for {alignment=} for {raw_line=}"
+        item = known_lines.get(line, None)
+        if not item:
+            if inbox_fn:
+                item = inbox_fn(line)
+            else:
+                item = line
+            known_lines[line] = item
+
+        if current_level == 0:
+            last_item = item
+            if output_root_only:
+                yield item
+            else:
+                yield None, item
+
+        else:
+            if child_react:
+                child_react(last_item,item)
+            if not output_root_only:
+                yield last_item, item
+
+
+
+
+
 
 
 

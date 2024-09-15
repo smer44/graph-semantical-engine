@@ -23,15 +23,15 @@ place
 
 def load_entities(text):
     eg = EntityGraph()
-    inbox_fn = eg.new_node_from_str
+    inbox_fn = eg.new_node_or_field_from_str
     output_root_only = True
-    child_react = eg.add_child
+    child_react = eg.add_field
     lines = text.splitlines()
     roots = [x for x in loads_indents(lines,inbox_fn,output_root_only=output_root_only,child_react=child_react)]
     return eg,roots
 
 def dump_entity(graph,entity):
-    children_fn = graph.children
+    children_fn = graph.fields
     shallow_str = lambda entity: repr(entity)
     text = "".join(dumps_indents(entity,children_fn,shallow_str))
     return text

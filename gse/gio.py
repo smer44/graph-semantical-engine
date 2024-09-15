@@ -1,6 +1,7 @@
+from gse.entitygraph import EntityGraph
 from gse.objgraph import ObjGraph
 from gse.dictgraph import DictGraph
-from gse.load import loads_indents, loads_parent_children
+from gse.load import loads_indents, loads_parent_children,load_one_indent
 from gse.dump import dumps_indents, dumps_parent_children
 
 
@@ -13,17 +14,37 @@ def load(file,format = "indents", gtype = "dict"):
     return load_lines(lines,format,gtype)
 
 
+
+def load_entities_with_fields(lines):
+    eg = EntityGraph()
+    inbox_fn = eg.new_node_or_field_from_str
+    output_root_only = True
+    child_react = eg.add_field_or_parent_line
+    roots = [x for x in load_one_indent(lines,
+                                        inbox_fn,
+                                        output_root_only=output_root_only,
+                                        child_react=child_react)
+             ]
+    return eg,roots
+
+
 def load_lines(lines,format = "indents", gtype = "dict"):
     """
     loads the graph object from the text
     :return graph, list of root nodes
     """
+    print(f"type of lines: {type(lines)}")
+    if format == "entities"  or format == "entities":
+        return load_entities_with_fields(lines)
+
     kwargs ={}
     if gtype =="d" or gtype == "dict":
         graph = DictGraph()
         kwargs["inbox_fn"] = graph.new_node
+        #kwargs["get_known_node"] = graph.get_node_by_value_or_none
     elif gtype =="d-" or gtype == "dict-":
         graph = DictGraph()
+        #kwargs["get_known_node"] = graph.get_node_by_value_or_none
     elif gtype =="o" or gtype == "obj":
         graph = ObjGraph()
         kwargs["inbox_fn"] = graph.new_node
@@ -50,7 +71,7 @@ def load_lines(lines,format = "indents", gtype = "dict"):
     # else:
     return graph, [item for item in load_fn(lines, **kwargs)]
 
-
+#TODO - extract that to loading/dumping options
 
 def dumps(graph,item, format = "indents",inbox = True):
     return "".join(dump_lines(graph,item,format,inbox))

@@ -15,13 +15,17 @@ class DictGraph:
 
 
     def new_node(self,value):
-        assert value not in self.nodes
+        assert value not in self.nodes, f"DictGraph.new_node : trying to create new node with knowed value:{value}"
         if self.inbox:
             node = InboxValue(value)
         else:
             node = value
         self.nodes[value] = node
         return node
+
+    #def get_node_by_value_or_none(self,value):
+    #    return self.nodes.get(value,None)
+
 
     def get_value(self,node):
         if self.inbox:

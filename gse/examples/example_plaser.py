@@ -34,7 +34,7 @@ print(dumps(vg,vg.roots[0]))
 
 #vg.place(vg.roots, 10,20,800-10,600-20,3)
 
-vg.place_stretch_min(vg.roots, 10,20,800-10,600-20,3)
+vg.place_stretch_min(vg.roots, 10,20,800-10,600-20,3,200,100)
 vg.finalize_places()
 
 print(dumps(vg,vg.roots[1]))

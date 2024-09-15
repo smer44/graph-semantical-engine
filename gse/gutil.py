@@ -137,8 +137,8 @@ class ViewGraph:
         my = (bottom + top)/2
         dx = right - left
         dy = top - bottom
-        ddx = min(50,dx/2.3)
-        ddy = min(25,dy/2.3)
+        ddx = dx/2.5
+        ddy = dy/2.5
 
         #self.left = mx-ddx
         #self.bottom = my-ddy
@@ -155,7 +155,7 @@ class ViewGraph:
         for node in self.nodes:
             self.finalize_bounds(node,node.left,node.bottom,node.right,node.top)
 
-    def place_stretch_min(self, roots, left,bottom,right,top, max_depth, xmin = 100):
+    def place_stretch_min(self, roots, left,bottom,right,top, max_depth, xmin,ymin ):
         dx = right - left
         dy = top - bottom
         xone_step = dx/self.roots_sum
@@ -166,7 +166,7 @@ class ViewGraph:
         #now, deepsize contains the scaled value.
         #now, place nodes according to node_dx:
 
-        ystep = dy / (max_depth + 1)
+        ystep = max(ymin, dy / (max_depth + 1))
         root_top = bottom + ystep
         global_left = left
         stack = [(root, True) for root in roots]

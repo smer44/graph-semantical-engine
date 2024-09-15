@@ -373,8 +373,7 @@ class GraphCanvas(Canvas):
         #self.configure(bg='white')
 
         for item in self.items.values():
-            self.move(item.rect_id, dx, dy)
-            self.move(item.text_id, dx, dy)
+            self.renderer.move_visual_item(self,item,dx,dy)
 
             item.left += dx
             item.bottom += dy

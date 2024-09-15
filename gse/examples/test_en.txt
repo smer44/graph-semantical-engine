@@ -1,0 +1,11 @@
+PhysicalObject: Object
+    +Physical # secondary parent
+    -size
+    -shape
+
+AssumedObject: Object,Assumed # multiple parents
+#and no fields
+
+
+InfoObject: Info, Object # order check
+    -infotype

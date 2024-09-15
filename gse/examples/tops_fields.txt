@@ -1,0 +1,10 @@
+PhysicalObject
+    -size
+    -shape
+
+AssumedObject
+    -purpose
+
+
+InfoObject
+    -infotype

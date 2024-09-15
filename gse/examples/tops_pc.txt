@@ -1,0 +1,37 @@
+Entity:SingleEntity,Collection
+SingleEntity:RealEntity,FormalEntity#disjoint
+RealEntity:Object,Action,Relation#disjoint
+Object:PhysicalObject,AssumedObject,InfoObject
+PhysicalObject:ObjectByPhysicalTrait,ObjectByOrigin,ObjectByFunctionality
+ObjectByPhysicalTrait:ObjectByStructure,ObjectByCapability,ObjectBySize,ObjectBySurface
+ObjectByStructure:ObjectByInnerOrdering,ObjectByComposition
+ObjectByInnerOrdering:InnerOrderedObject,ConglomerationObject#disjoint
+
+ObjectByComposition:ByChemicalElementObject,MolecularComposedObject,NanoComposedObject,ObjectMicroComposed, ObjectMacroComposed#those are constructions
+ByChemicalElementObject:ChemicalElement,Alloy
+MolecularComposedObject: MolecularObject,PolymericObject
+NanoComposedObject:OrganicalObject,NanoNotOrganicalObject
+MolecularObject:Water
+PolymericObject:Oil
+ObjectMicroComposed:Mineral
+OrganicalObject:Wood,Flesh
+ObjectBySize: MicroObject, CompactObject,GeographicalObject,AstronomicalObject
+ObjectBySurface:ObjectByTexture,ObjectByColor
+ObjectByOrigin:NaturalObject,ArtificalObject
+
+ObjectByCapability:ObjectByActiveCapability, ObjectByIntelligence
+ObjectByActiveCapability: ActiveObject,PassiveObject #disjoint
+ObjectByIntelligence: IntelligentObject,NonIntelligentObject # disjoint
+
+ActiveObject:NaturalActiveLivingObject
+OrganicalObject:NaturalActiveLivingObject
+NaturalObject:NaturalActiveLivingObject
+
+AssumedObject:JuraObject
+
+InfoRepresentationObject:InfoObjectByRepresentationType
+InfoObjectByRepresentationType: AnalogyInfoReprObject,SymbolicalInfoReprObject
+AnalogyInfoReprObject:Image,Scuplture
+SymbolicalInfoObject:TextObject
+
+

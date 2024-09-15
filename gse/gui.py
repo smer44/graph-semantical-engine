@@ -2,7 +2,7 @@ import tkinter as tk
 
 from tkinter import simpledialog
 from gse.gutil import ViewNode
-from gse.gio import load
+from gse.gio import load,load_lines,dumps
 from gse.gutil import ViewGraph
 from gse.inbox import InboxValue
 
@@ -135,13 +135,24 @@ class App:
         file_name_graph = filedialog.askopenfilename(filetypes=(('TXT files', '*.txt'), ('YAML files', '*.yaml')))
         if file_name_graph:
             with open(file_name_graph, 'r', encoding='utf-8') as file_graph:
+                #file_name_graph is str.
+                lines = file_graph.readlines()
+                if file_name_graph.endswith("_pc.txt"):
+                    format = "parent_child"
+                elif file_name_graph.endswith("_en.txt"):
+                    format = "entities"
+                else:
+                    format = "indents"
+                og, roots = load_lines(lines,format,gtype="dict")
+                print("--- Graph loaded: ---")
+                print(dumps(og,roots[0], inbox = False))
                 #TODO currently, loading pure graph and then creates a viewgraph
-                og, roots = load(file_graph)
+                #og, roots = load(file_graph)
                 vg = ViewGraph()
-                vg.view_filter(og, roots, None, 4)
+                vg.view_filter(og, roots, None, 5)
 
 
-                vg.place_stretch_min(vg.roots, 10, 20, 800 - 10, 600 - 20, 3)
+                vg.place_stretch_min(vg.roots, 10, 20, 800 - 10, 600 - 20, 3, 200,100)
                 vg.finalize_places()
                 self.canvas.delete_all()
                 self.canvas.reset_graph(vg)

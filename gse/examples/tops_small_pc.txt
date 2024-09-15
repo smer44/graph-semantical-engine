@@ -1,0 +1,4 @@
+Entity:SingleEntity,Collection
+SingleEntity:RealEntity,FormalEntity#disjoint
+RealEntity:Object,Action,Relation#disjoint
+Object:PhysicalObject,AssumedObject,InfoObject
