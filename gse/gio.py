@@ -20,11 +20,19 @@ def load_entities_with_fields(lines):
     inbox_fn = eg.new_node_or_field_from_str
     output_root_only = True
     child_react = eg.add_field_or_parent_line
-    roots = [x for x in load_one_indent(lines,
+    #Those are roots in the notation what can differ
+    #by actual rules
+    notation_roots = [x for x in load_one_indent(lines,
                                         inbox_fn,
+                                        #inverse=True,
                                         output_root_only=output_root_only,
-                                        child_react=child_react)
+                                        child_react=child_react,
+                                                 )
              ]
+
+    roots = [x for x in eg.gen_roots()]
+    #roots = [x for x in eg.gen_primary_roots()]
+
     return eg,roots
 
 

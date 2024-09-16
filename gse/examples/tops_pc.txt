@@ -2,7 +2,7 @@ Entity:SingleEntity,Collection
 SingleEntity:RealEntity,FormalEntity#disjoint
 RealEntity:Object,Action,Relation#disjoint
 Object:PhysicalObject,AssumedObject,InfoObject
-PhysicalObject:ObjectByPhysicalTrait,ObjectByOrigin,ObjectByFunctionality
+PhysicalObject:ObjectByPhysicalTrait,ObjectByOrigin,ObjectByFunctionality,ObjectByItsAction
 ObjectByPhysicalTrait:ObjectByStructure,ObjectByCapability,ObjectBySize,ObjectBySurface
 ObjectByStructure:ObjectByInnerOrdering,ObjectByComposition
 ObjectByInnerOrdering:InnerOrderedObject,ConglomerationObject#disjoint
@@ -29,9 +29,20 @@ NaturalObject:NaturalActiveLivingObject
 
 AssumedObject:JuraObject
 
+ObjectByFunctionality : InfoRepresentationObject, UsedByShapeObject,UsedByActivenessObject ,UsedByInnerActivenessObject
 InfoRepresentationObject:InfoObjectByRepresentationType
 InfoObjectByRepresentationType: AnalogyInfoReprObject,SymbolicalInfoReprObject
 AnalogyInfoReprObject:Image,Scuplture
 SymbolicalInfoObject:TextObject
+UsedByShapeObject:Furniture,BuildingBlockBeforePlacement,ToolUsedByShape
+ToolUsedByShape:Hammer
+UsedByActivenessObject:UsedBySelfMovementObject,UsedByOuterPartMovementObject
+UsedBySelfMovementObject:Vehicle,Сourier
+UsedByOuterPartMovementObject : Mechanism
+UsedByInnerActivenessObject: Device
+Device:Printer,Monitor
+
+
+
 
 

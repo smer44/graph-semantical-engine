@@ -27,6 +27,8 @@ class GraphCanvas(Canvas):
         self.middle_drag_data = {"x": 0, "y": 0}
 
         self.create_counter = 0
+        self.last_item = None
+        self.last_event = None
 
     def create_default_items(self):
         # Initialize some Item objects
@@ -210,6 +212,8 @@ class GraphCanvas(Canvas):
 
 
     def execute_task(self, item,event):
+        if item is None:
+            print(f"execute_task: called with item is None, with task: {self.tasks_after}")
 
         if self.tasks_after =="create":
             self.create_new_item(event.x,event.y)
@@ -290,12 +294,12 @@ class GraphCanvas(Canvas):
     def edit_text(self, event):
         item = self.find_closest_item(event.x, event.y)
         if item:
+
             new_text = simpledialog.askstring("Input", "Edit text:", initialvalue=str(item.value))
             if new_text:
                 self.renderer.update_text_on_item(self,item,new_text)
 
 
-    #TODO - this should be removed to some creator:
     def create_new_item(self, x, y):
         #assert self.viewgraph is not None, f"{type(self).__name__}.create_new_item : called with graph not set"
         if self.viewgraph is None:

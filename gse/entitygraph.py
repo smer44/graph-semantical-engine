@@ -17,6 +17,28 @@ class Entity:
         for k,v in self.fields.items():
             yield f"-{k}" , f"{v}"
 
+    #this must be in the controller
+    def gen_show_edit_fields(self):
+        for sp in self.sparents:
+            yield f"+{sp.name}"
+        for k in self.fields:
+            yield f"-{k}"
+
+    def gen_immutable_fields(self):
+        return set()
+
+    def get_field_or_sparent(self,line):
+        if line[0] == "+":
+            sp_name = line[1:]
+            for sp in self.sparents:
+                if sp.name == sp_name:
+                    return sp
+        elif line [0] == "-":
+            field_name = line[1:]
+            return self.fields[field_name]
+
+
+
 
 
 
@@ -38,7 +60,10 @@ class Entity:
 
 
     def __repr__(self):
-        return f"{self.idn}.{self.name}"
+        return f"{self.idn=}.{self.name}"
+
+    def __str__(self):
+        return f"{self.name}"
 
     def get_displayed_fields(self):
         return self.fields.keys()
@@ -49,15 +74,15 @@ class Entity:
         else:
             text = [f"{self.name} :{self.parent.name}\n"]
         for sp in self.sparents:
-            text.append(f"\t+{sp.name}\n")
+            text.append(f"\t+ {sp.name}\n")
         for field_name in self.fields:
-            text.append(f"\t-{field_name}\n")
+            text.append(f"\t- {field_name}\n")
         s = "".join(text)
         return s
 
     def dump_debug(self):
         if self.parent is None:
-            text = [f"{self.name=}\n"]
+            text = [f"{self.idn=}.{self.name=}\n"]
         else:
             text = [f"{self.name=} :{self.parent.name=}\n"]
         for secondary_parent in self.sparents:
@@ -77,10 +102,34 @@ class EntityGraph:
         node.add_field(field.name,field)
 
 
+    def gen_roots(self):
+        """
+        Generator what returns all roots
+        in the given graph. A root is an entity
+        who has no main parent, and then also
+        must not have secondary parents
+        :return:
+        """
+        for entity in self.entities:
+            if entity.parent is None:
+                assert not entity.sparents, f"gen_roots : {entity=} has secondary parents but not main parent"
+                yield entity
+
+    def gen_primary_roots(self):
+        dejavu = set()
+        for entity in self.entities:
+            parent = entity.parent
+            if parent:
+                if parent.parent is None:
+                    assert not parent.sparents, f"gen_primary_roots : {parent=} has secondary parents but not the main parent"
+                if parent.idn not in dejavu:
+                    dejavu.add(parent.idn)
+                    yield parent
 
     def inbox_field_or_parent_line(self,line):
         return line[0] == "-" or line[0] == "+"
-    def new_node_or_field_from_str(self,id_dot_name,get_if_exists=False ):
+    def new_node_or_field_from_str(self,id_dot_name):
+        print(" - new_node_or_field_from_str of :" , id_dot_name)
         if self.inbox_field_or_parent_line(id_dot_name):
             return id_dot_name
         return self.inbox_header_line(id_dot_name)
@@ -125,18 +174,27 @@ class EntityGraph:
     def inbox_header_line(self,line):
         if line[0] == "-" or line[0] == "+":
             raise ValueError(f"inbox_header_line : field instead of a header : {line}")
-        item_str,parent_str = line.split(":")
-        item_str = item_str.strip()
-        parent_str = parent_str.strip()
-        assert item_str and parent_str
-        item = self.new_node_from_str(item_str, True)
-        parent_strs =  parent_str.split(",")
-        assert parent_strs
-        for parent_str in parent_strs:
-            parent_str  = parent_str.strip()
-            parent = self.new_node_from_str(parent_str, True)
-            item.add_parent(parent)
-        return item
+        item_str_parent_str = line.split(":")
+        ln = len(item_str_parent_str)
+        if ln == 1:
+            item_str = item_str_parent_str[0]
+            item_str = item_str.strip()
+            item = self.new_node_from_str(item_str, True)
+            return item
+        if ln == 2:
+            item_str, parent_str = item_str_parent_str
+            item_str = item_str.strip()
+            parent_str = parent_str.strip()
+            assert item_str and parent_str
+            item = self.new_node_from_str(item_str, True)
+            parent_strs =  parent_str.split(",")
+            assert parent_strs
+            for parent_str in parent_strs:
+                parent_str  = parent_str.strip()
+                parent = self.new_node_from_str(parent_str, True)
+                item.add_parent(parent)
+            return item
+        raise ValueError(f"inbox_header_line : wrong amount of colon in a header : {line}")
 
 
 

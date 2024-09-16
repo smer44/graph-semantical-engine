@@ -148,9 +148,11 @@ def load_one_indent(lines,
                     inbox_fn,
                     commentchr = "#",
                     alignment = 4,
+                    inverse = False,
                     output_root_only = False,
                     child_react = None):
     known_lines = dict()
+    known_children = set()
     last_item = None
     for raw_line in lines:
         current_level, line = __line_to_level_line__(raw_line, commentchr)
@@ -165,18 +167,30 @@ def load_one_indent(lines,
                 item = line
             known_lines[line] = item
 
+
+
         if current_level == 0:
+            if inverse:
+                known_children.add(line)
             last_item = item
-            if output_root_only:
-                yield item
-            else:
-                yield None, item
 
         else:
-            if child_react:
-                child_react(last_item,item)
-            if not output_root_only:
-                yield last_item, item
+            if  inverse:
+                if child_react:
+                    child_react(item, last_item)
+
+            else:
+                if child_react:
+                    child_react(last_item, item)
+                known_children.add(line)
+                if not output_root_only:
+                    yield last_item, item
+
+    if output_root_only:
+        root_keys =  known_lines.keys() - known_children
+        for root_key in root_keys:
+            yield known_lines[root_key]
+
 
 
 

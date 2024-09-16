@@ -29,7 +29,7 @@ class gCanvasClzItemRenderer:
             if not k.startswith("_"):
                 v = getattr(item, k)
                 if not callable(v):
-                    shown_fields.append((k,v))
+                    shown_fields.append((k,str(v)))
 
         return header_str, shown_fields
 
@@ -61,41 +61,72 @@ class gCanvasClzItemRenderer:
         #Create header
         #header_str = self.get_item_header(inboxed_item)
 
-        hleft =item.left+1
-        hbot = item.bottom+1
-        hright = item.right -1
-        htop = item.bottom + self.header_height-1
+        #those are estimated, too large coordinates:
+        hleft =item.left
+        hbot = item.bottom
+        hright = item.right
+        htop = item.bottom
 
         #header_rect_id = canvas.create_rectangle(hleft, hbot, hright, htop, outline='gray', width=1)
 
         #header_line_id = canvas.create_line(hleft, htop, hright, htop,fill='gray', width=1)
-        header_text_id = canvas.create_text((hleft + hright) / 2, (hbot + htop) / 2,
-                                        text=header_str)
+        initial_x, initial_y = (hleft + hright) / 2, (hbot + htop) / 2,
+        header_text_id = canvas.create_text(initial_x, initial_y,text=header_str,anchor='center')
+        header_coords = canvas.bbox(header_text_id)
+        xmin,y0,xmax,ymax = header_coords
+        ymax+=2
+        yheader = ymax
 
-        rect_id = canvas.create_rectangle(item.left, item.bottom, item.right, item.top, outline='gray', width=2)
-        item.rect_id = rect_id
-        htop +=2
-        step = (item.top - htop) // len(shown_fields)
-        step_half = step//2
+        #rect_id = canvas.create_rectangle(item.left, item.bottom, item.right, item.top, outline='gray', width=2)
+        #item.rect_id = rect_id
+        #htop +=2
+        #step = (item.top - htop) // len(shown_fields)
+        #step_half = step//2
         #text_mid_x = (item.left + item.right) // 2
-        text_name_x = (item.left + item.left +item.left +item.right) // 4
-        text_value_x = (item.left + item.right+ item.right+ item.right) // 4
-        text_bot = htop+step_half
+        #text_name_x = (item.left + item.left +item.left +item.right) // 4
+        #text_value_x = (item.left + item.right+ item.right+ item.right) // 4
+        #text_bot = htop+step_half
 
         item.__setattr__("visuals",list())
         #item.visuals.append(header_line_id)
         item.visuals.append(header_text_id)
 
+        lines = []
         for field_name, value in shown_fields:
+            line = f"{field_name} : {value}"
+            lines.append(line)
+        lined_text = "\n".join(lines)
+        line_amount = len(lines)
+        #body_text_id = canvas.create_line(hleft, htop, hright, htop, fill='gray', width=1)
+        body_text_id = canvas.create_text(initial_x, ymax, text=lined_text,anchor='n')
+        header_coords = canvas.bbox(body_text_id)
+        xmin2, _, xmax2, ymax = header_coords
+        xmin = min(xmin,xmin2)
+        xmax = max(xmax,xmax2)
+        item.visuals.append(body_text_id)
+        item.left, item.bottom, item.right, item.top = xmin, y0,xmax,ymax
+        rect_id = canvas.create_rectangle(item.left, item.bottom, item.right, item.top, outline='gray', width=2)
+        item.rect_id = rect_id
+        if line_amount > 0:
+            ystep =(ymax - yheader) //(line_amount)
+            y1 = yheader
+            for line_nr in range(line_amount):
+                middle_line = canvas.create_line(item.left+2, y1, item.right-2, y1,fill='gray', width=1)
+                item.visuals.append(middle_line)
+                y1 = y1+ystep
+
+
+
             #value = getattr(item.value,field_name)
-            field_name_id = canvas.create_text(text_name_x,text_bot, text=field_name)
-            field_value_id = canvas.create_text(text_value_x, text_bot, text=value)
-            line_before_field_id = canvas.create_line(hleft, htop, hright, htop,fill='gray', width=1)
-            item.visuals.append(field_name_id)
-            item.visuals.append(field_value_id)
-            item.visuals.append(line_before_field_id)
-            text_bot =  text_bot+step
-            htop += step
+            #field_name_id = canvas.create_text(text_name_x,text_bot, text=field_name)
+            #field_value_id = canvas.create_text(text_value_x, text_bot, text=value)
+            #line_before_field_id = canvas.create_line(hleft, htop, hright, htop,fill='gray', width=1)
+            #item.visuals.append(field_name_id)
+            #item.visuals.append(field_value_id)
+            #item.visuals.append(line_before_field_id)
+            #text_bot =  text_bot+step
+            #htop += step
+
 
 
     def update_color(self,canvas, item, is_selected,is_selected_for_connect):

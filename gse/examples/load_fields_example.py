@@ -34,11 +34,11 @@ def dump_entity_children(graph,entity):
     text = "".join(dumps_indents(entity,children_fn,shallow_str))
     return text
 
-
-eg,roots = load_entities_with_fields(text)
+lines = text.splitlines()
+eg,roots = load_entities_with_fields(lines)
 
 for root in roots:
-    print("---")
+    print("-- root --")
     print(root.dump_debug())
 
 print(eg.entities)
