@@ -4,11 +4,9 @@ import tkinter as tk
 
 eg = EntityGraph()
 
-action = eg.new_node_or_field_from_str("action", )
+action = eg.get_or_create_node("action", )
 
-speed = eg.new_node_or_field_from_str("speed", )
-
-eg.add_field(action,speed)
+speed = eg.add_field(action, "speed", "fast" )
 
 root = tk.Tk()
 

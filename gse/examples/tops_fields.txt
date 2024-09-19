@@ -1,10 +1,10 @@
 PhysicalObject
-    -size
-    -shape
+    -size [big,small,geographical,mirco]
+    -shape [round,square,branched]
 
 AssumedObject
-    -purpose
+    -purpose [fun, work]
 
 
 InfoObject
-    -infotype
+    -infotype [video,image,text]
