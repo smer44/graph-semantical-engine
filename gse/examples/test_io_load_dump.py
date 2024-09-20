@@ -86,7 +86,8 @@ def test_dictgraph_inbox():
 
     for root in roots:
         print(f"---{type(root)=} {root=} ---")
-        print(dumps(graph,root))
+        #you can dumps by id and then get values by shallow_str
+        print(dumps(graph,root, shallow_str = lambda id: graph.values[id]))
         #print(gol.dumps(root))
 
 test_dictgraph_inbox()

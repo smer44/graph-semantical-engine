@@ -261,3 +261,27 @@ class EntityGraphController:
         entity.fields[new_field_name] = new_field_value
         prefix_field_name = "-" + new_field_name
         return prefix_field_name
+
+
+    def validate_all(self,master):
+        field_frames = master.field_frames
+        dejavu = set()
+        was_root = False
+        for n,x in enumerate(field_frames):
+            field_name = x.name_var.get().strip()
+            if not field_name:
+                return False , n, field_name
+            if field_name in dejavu:
+                return False , n, field_name
+            dejavu.add(field_name)
+            if field_name[0] != "-" and field_name[0] != "+":
+                return False, n, field_name + "field_name[0] is neither - nor +"
+            else:
+                if len(field_name) == 1:
+                    return False, n, field_name + "len(field_name) == 1"
+
+            if field_name.startswith("++"):
+                if was_root or len(field_name) == 2:
+                    return False, n, field_name
+                was_root = True
+        return True, -1, None

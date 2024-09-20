@@ -12,6 +12,7 @@ class DictGraph:
         self.max_id = 0
         #self.unique_values= true
         self.children_edge = self.children_by_id_and_edge
+        self.children = self.children_by_id_all
         self.dumps = lambda node: dumps_indents(node,
                                                 self.children,
                                                 )
@@ -68,7 +69,7 @@ class DictGraph:
 
     def children_by_id_all(self,id):
         edges = self.edges_of_node.get(id,None)
-        return self.children_edges(id,edges)
+        return self.children_by_id_and_edges(id,edges)
 
 
     def children_by_id_and_edges(self,id,edges):

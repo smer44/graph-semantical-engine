@@ -5,7 +5,7 @@ from gse.entitygraphcontroller import EntityGraphController
 
 
 class TkEditObjectFrame(tk.Frame):
-    def __init__(self, master,node,  *args, **kwargs):
+    def __init__(self, master, node, controller, *args, **kwargs):
         super().__init__(master, *args, **kwargs)
         #self.graph = graph
         self.node = node
@@ -14,8 +14,8 @@ class TkEditObjectFrame(tk.Frame):
         #TODO - this should be in the controller
         #self.init_functions_for_entitygraph(graph,node)
         self.field_frames = []
-        self.controller = EntityGraphController()
-        self.valiate_all = self.validate_field_names_for_entity
+        self.controller = controller
+        #self.valiate_all = self.validate_field_names_for_entity
         self.init_ui()
 
 
@@ -68,6 +68,14 @@ class TkEditObjectFrame(tk.Frame):
         print_button = tk.Button(self, text="Print Object", command=self.print_object)
         print_button.pack(side=tk.BOTTOM, pady=5)
 
+        correct_fields, wrong_field_number, wrong_field_name = self.controller.validate_all(self)
+        if not correct_fields:
+            self.warning_label.config(text=f"Wrong field number {wrong_field_number} name {wrong_field_name}!")
+        else:
+            self.warning_label.config(text="")
+
+
+
 
 
 
@@ -82,27 +90,19 @@ class TkEditObjectFrame(tk.Frame):
         print(f" --- Instance of class: {obj.__class__.__name__} ---"  )
         print(self.controller.dump_field_name_values(obj))
 
-    def validate_field_names_for_entity(self):
+
+    def validate_field_names_for_obj(self):
         dejavu = set()
-        was_root = False
-        for n,x in enumerate(self.field_frames):
+        for n, x in enumerate(self.field_frames):
             field_name = x.name_var.get().strip()
             if not field_name:
                 return False , n, field_name
             if field_name in dejavu:
                 return False , n, field_name
-            dejavu.add(field_name)
-            if field_name[0] != "-" and field_name[0] != "+":
-                return False, n, field_name + "field_name[0] is neither - nor +"
-            else:
-                if len(field_name) == 1:
-                    return False, n, field_name + "len(field_name) == 1"
-
-            if field_name.startswith("++"):
-                if was_root or len(field_name) == 2:
-                    return False, n, field_name
-                was_root = True
         return True, -1, None
+
+
+
 
 
     def update_all_field_names_and_values(self):
@@ -118,7 +118,22 @@ class TkEditObjectFrame(tk.Frame):
             frame.value_var.set(new_value)
 
 
+    def update_all_values(self,event = None):
+        """
+        To check the correction and get feedback from any object
+        you must send him all changes and update all values simultaneously
+        :param event:
+        :return:
+        """
+        print(" !! update_all_values")
+        is_correct, wrong_field_number, wrong_field_name = self.controller.validate_all(self)
+        if not is_correct:
+            print(f"Validation it not correct : {wrong_field_number} : {wrong_field_name}")
+            self.warning_label.config(text=f"Field number {wrong_field_number} : {wrong_field_name} is incorrect!")
 
+        else:
+            self.warning_label.config(text="")
+            self.update_all_field_names_and_values()
 
 class ObjectFieldDisplayFrame(tk.Frame):
 
@@ -141,13 +156,14 @@ class ObjectFieldDisplayFrame(tk.Frame):
         name_entry = tk.Entry(self, textvariable=name_var)
         name_entry.pack(side=tk.LEFT, padx=5)
 
+        update_all_fn = self.master.update_all_values
         if self.is_immutable:
             name_entry.config(state=tk.DISABLED)
         else:
             #name_entry.bind("<Return>",self.update_field_name)
             #name_entry.bind("<KeyRelease>", self.update_all_values)
-            name_entry.bind("<Return>",self.update_all_values)
-            name_entry.bind("<KeyRelease>", self.update_all_values)
+            name_entry.bind("<Return>",update_all_fn)
+            name_entry.bind("<KeyRelease>", update_all_fn)
 
         value = self.master.controller.get_prefixed_field_value(self.master.node,   self.field_name) # getattr(self.obj,self.field_name)
         str_value = self.converter.tostr(value)
@@ -159,9 +175,9 @@ class ObjectFieldDisplayFrame(tk.Frame):
         value_entry = tk.Entry(self, textvariable=value_var)
         value_entry.pack(side=tk.LEFT,fill = tk.BOTH, padx=5)
         #value_entry.bind("<Return>", self.update_field_value)
-        value_entry.bind("<Return>", self.update_all_values)
+        value_entry.bind("<Return>", update_all_fn)
         #value_entry.bind("<KeyRelease>", self.update_field_value)#update_all_values
-        value_entry.bind("<KeyRelease>", self.update_all_values)
+        value_entry.bind("<KeyRelease>", update_all_fn)
 
 
     def update_field_name(self, event):
@@ -192,21 +208,7 @@ class ObjectFieldDisplayFrame(tk.Frame):
                 self.master.warning_label.config(text="")
 
 
-    def update_all_values(self,event):
-        """
-        To check the correction and get feedback from any object
-        you must send him all changes and update all values simultaneously
-        :param event:
-        :return:
-        """
-        print(" !! update_all_values")
-        is_correct, wrong_field_number, wrong_field_name = self.master.valiate_all()
-        if not is_correct:
-            self.master.warning_label.config(text=f"Field number {wrong_field_number} : {wrong_field_name} is incorrect!")
 
-        else:
-            self.master.warning_label.config(text="")
-            self.master.update_all_field_names_and_values()
 
 
 
@@ -232,7 +234,8 @@ class ObjectFieldDisplayFrame(tk.Frame):
             return
 
         # Remove the attribute from the object
-        self.master.controller.remove_field_for_gui(self.master.node,  self.field_name)
+        field_name = self.name_var.get().strip()
+        self.master.controller.remove_field_for_gui(self.master.node,  field_name)
         self.master.field_frames.remove(self)
         self.destroy()
 
