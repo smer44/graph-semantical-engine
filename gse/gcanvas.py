@@ -310,7 +310,7 @@ class GraphCanvas(Canvas):
         #text_var = InboxValue(f"New Item {self.create_counter}")
         #TODO - this must be changed to creating a node out of text value
         value = f"New Item {self.create_counter}"
-        new_item = self.viewgraph.new_inboxed_node(value)
+        new_item = self.viewgraph.new_inboxed_node(self.original_graph,value)
 
         new_item.set_coords(x+dx0, y+dy0, x + dx1, y + dy1)
         self.create_counter+=1
@@ -389,9 +389,10 @@ class GraphCanvas(Canvas):
 
 
 
-    def reset_graph(self,viewgraph):
-        nodes = viewgraph.nodes
+    def reset_graph(self,original_graph,viewgraph):
+        self.original_graph = original_graph
         self.viewgraph = viewgraph
+        nodes = viewgraph.nodes
         for vnode in nodes:
             self.add_item_to_canvas(vnode)
             # print("recht_id children: ", vnode.children)

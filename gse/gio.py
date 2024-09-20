@@ -17,13 +17,14 @@ def load(file,format = "indents", gtype = "dict"):
 
 def load_entities_with_fields(lines):
     eg = EntityGraph()
-    inbox_fn = eg.new_node_or_field_from_str
+    inbox_header = eg.load_header
+    #inbox_field = eg.load_field
     output_root_only = True
-    child_react = eg.add_field_or_parent_line
+    child_react = eg.load_field
     #Those are roots in the notation what can differ
     #by actual rules
     notation_roots = [x for x in load_one_indent(lines,
-                                        inbox_fn,
+                                        inbox_header,
                                         #inverse=True,
                                         output_root_only=output_root_only,
                                         child_react=child_react,
@@ -61,7 +62,7 @@ def load_lines(lines,format = "indents", gtype = "dict"):
     else:
         raise ValueError(f"loads: unknown graph type: {gtype}")
 
-    kwargs["child_react"] = graph.add_child
+    kwargs["child_react"] = graph.add_child_by_id
     kwargs["output_root_only"] =  True
     if format == "indents":
         load_fn = loads_indents
@@ -81,15 +82,15 @@ def load_lines(lines,format = "indents", gtype = "dict"):
 
 #TODO - extract that to loading/dumping options
 
-def dumps(graph,item, format = "indents",inbox = True):
-    return "".join(dump_lines(graph,item,format,inbox))
+def dumps(graph,item, format = "indents",shallow_str = lambda node: str(node.value)):
+    return "".join(dump_lines(graph,item,format,shallow_str))
 
-def dump(graph,item,file, format = "indents",inbox = True):
-    for line in dump_lines(graph,item,format,inbox):
+def dump(graph,item,file, format = "indents",shallow_str = lambda node: str(node.value)):
+    for line in dump_lines(graph,item,format,shallow_str):
         file.write(line)
 
 
-def dump_lines(graph,item, format = "indents",inbox = True ):
+def dump_lines(graph,item, format = "indents",shallow_str = lambda node: str(node.value)):
     kwargs = {}
     if format == "indents":
         dump_fn = dumps_indents
@@ -102,8 +103,4 @@ def dump_lines(graph,item, format = "indents",inbox = True ):
     else:
         raise ValueError(f"loads: unknown format: {format}")
 
-    if inbox:
-        shallow_str = lambda node: str(node.value)
-    else:
-        shallow_str = str
     return dump_fn(item,graph.children,shallow_str)

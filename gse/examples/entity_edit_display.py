@@ -1,4 +1,4 @@
-from gse.tkobjframe import *
+from gse.tkeditobjframe import *
 from gse.entitygraph import *
 import tkinter as tk
 
@@ -10,7 +10,7 @@ speed = eg.add_field(action, "speed", "fast" )
 
 root = tk.Tk()
 
-frame = ObjectDisplayFrame(root, eg, action)
+frame = TkEditObjectFrame(root, action)
 
 frame.pack()
 

@@ -3,8 +3,9 @@ from gse.inbox import InboxValue
 from gse.inboxcounter import InboxCounterValue
 class ViewNode:
 
-    def __init__(self,node,depth = 0):
-        self.value = node
+    def __init__(self,original_value, original_node_or_id,depth = 0):
+        self.original_node_or_id = original_node_or_id
+        self.value = original_value
         self.deepsize = 0
         self.depth = depth
         self.top = None
@@ -42,14 +43,15 @@ class ViewGraph:
         self.dumps = lambda node : "".join(dumps_indents(node,self.children))
         #self.roots = []
 
-    def new_node(self,value,depth = 0):
-        node = ViewNode(value,depth)
+    def new_node(self,original_graph, node_or_id,depth = 0):
+        original_value = original_graph.get_value(node_or_id)
+        node = ViewNode(original_value, node_or_id,depth)
         self.nodes.append(node)
         return node
 
-    def new_inboxed_node(self,value,depth=0):
-        value = InboxCounterValue(value)
-        return self.new_node(value,depth)
+    def new_inboxed_node(self,original_graph,value,depth=0):
+        node_or_id = original_graph.new_node(value)
+        return self.new_node(original_graph,node_or_id,depth)
 
 
 
@@ -92,7 +94,7 @@ class ViewGraph:
 
 #TODO - replace maxdepth with self.depth ?
     def view_filter(self,graph, roots,edge, maxdepth):
-        self.roots = [self.new_node(root) for root in roots]
+        self.roots = [self.new_node(graph, root) for root in roots]
         stack = [root for root in self.roots]
         dejavu = dict()
         while stack:
@@ -102,13 +104,13 @@ class ViewGraph:
                 viewnode.deepsize = 1
                 next_depth = viewnode.depth + 1
                 if next_depth <= maxdepth:
-                    filtered_children = graph.children_edge(viewnode.value, edge)
+                    filtered_children = graph.children_edge(viewnode.original_node_or_id, edge)
                     if filtered_children:
                         stack.append(viewnode)
                         for fchild in filtered_children:
                             viewchild = dejavu.get(fchild,None)
                             if viewchild is None:
-                                viewchild = self.new_node(fchild,next_depth)
+                                viewchild = self.new_node(graph, fchild,next_depth)
                                 self.add_child(viewnode,viewchild)
                                 stack.append(viewchild)
                                 print("created child for node ", viewnode, viewchild, "stack : ", stack)
@@ -298,19 +300,6 @@ class ViewGraph:
                     top = child_top
                     stack.append((child,left,bottom,False))
                     self.finalize_bounds(child,left,bottom,right,top)
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

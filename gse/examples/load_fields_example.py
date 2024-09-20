@@ -1,6 +1,6 @@
 from gse.load import load_one_indent
 from gse.entitygraph import EntityGraph
-from gse.dump import dumps_indents
+from gse.dump import dumps_indents , dump_entity
 from gse.gio import load_entities_with_fields
 
 text = """
@@ -17,22 +17,24 @@ InfoObject: Info, Object # order check
     -infotype      
 """
 
-eg = EntityGraph()
+
 
 
 
 
 def dump_entity_indents(graph,entity):
-    children_fn = graph.fields_names
+    children_fn_fields = lambda node : graph.fields_names_if_entity(node, "-")
     shallow_str = lambda entity: repr(entity)
-    text = "".join(dumps_indents(entity,children_fn,shallow_str))
+    text = "".join(dumps_indents(entity,children_fn_fields,shallow_str))
     return text
 
 def dump_entity_children(graph,entity):
-    children_fn = graph.children
+    children_fn_fields = lambda node : graph.fields_names_if_entity(node)
     shallow_str = lambda entity: repr(entity)
-    text = "".join(dumps_indents(entity,children_fn,shallow_str))
+    text = "".join(dump_entity(entity))
     return text
+
+eg = EntityGraph()
 
 lines = text.splitlines()
 eg,roots = load_entities_with_fields(lines)

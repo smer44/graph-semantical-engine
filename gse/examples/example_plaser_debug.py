@@ -2,8 +2,6 @@ from gse.dictgraph import DictGraph
 from gse.gutil import ViewGraph
 from gse.gio import dumps, loads
 
-from gse.examples.dummy_display import ViewNodeDummyDisplay
-
 #load graph from string:
 
 #file = open("./load_me.txt", "r")
@@ -28,8 +26,8 @@ nodes = vg.nodes
 print("nodes:" , nodes)
 
 
-
-vg.place_stretch_min(vg.roots, 10,20,800-10,600-20,3)
+xmin,ymin = 100,50
+vg.place_stretch_min(vg.roots, 10,20,800-10,600-20,3,xmin,ymin)
 vg.finalize_places()
 print(dumps(vg,vg.roots[0]))
 print(dumps(vg,vg.roots[1]))
@@ -45,7 +43,7 @@ import tkinter as tk
 
 root = tk.Tk()
 app = App(root)
-app.canvas.add_nodes(vg,nodes)
+app.canvas.reset_graph(og,vg)
 root.mainloop()
 
 

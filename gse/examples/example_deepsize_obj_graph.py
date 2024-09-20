@@ -1,5 +1,6 @@
 from gse.gutil import *
 from gse.objgraph import ObjGraph
+from gse.gio import dumps
 
 og = ObjGraph()
 
@@ -20,8 +21,9 @@ og.add_child(ab,ab1)
 og.add_child(ab,ab2)
 og.add_child(ab,ab3)
 
+shallow_fn = lambda node : node.repr_dsize()
 
-print(root.dumps())
+print(dumps(og, root,shallow_str = shallow_fn))
 
 
 gu = gUtil()
@@ -29,7 +31,7 @@ gu = gUtil()
 gu.calc_deepsize(og,[root])
 
 print("Acyclic graph should run fine:")
-print(root.dumps())
+print(dumps(og, root,shallow_str = shallow_fn))
 
 
 print("Now, lets try cyclic graph, this also should produce reasonable size:")
@@ -50,6 +52,6 @@ og.add_child(c,root)
 
 gu.calc_deepsize(og,[root])
 
-print(root.dumps())
+print(dumps(og, root,shallow_str = shallow_fn))
 
 

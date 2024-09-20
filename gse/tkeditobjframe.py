@@ -1,36 +1,23 @@
 import tkinter as tk
 from tkinter import messagebox
 from gse.converter import IdentityConverter, StrToSimpleValueConverter
+from gse.entitygraphcontroller import EntityGraphController
 
 
-
-class ObjectDisplayFrame(tk.Frame):
-    def __init__(self, master, graph,node,  *args, **kwargs):
+class TkEditObjectFrame(tk.Frame):
+    def __init__(self, master,node,  *args, **kwargs):
         super().__init__(master, *args, **kwargs)
-        self.graph = graph
+        #self.graph = graph
         self.node = node
         #self.displayed_fields = displayed_fields
         #self.immutable_fields = immutable_fields if immutable_fields is not None else []
         #TODO - this should be in the controller
-        self.init_functions_for_entitygraph(graph,node)
+        #self.init_functions_for_entitygraph(graph,node)
         self.field_frames = []
-
+        self.controller = EntityGraphController()
+        self.valiate_all = self.validate_field_names_for_entity
         self.init_ui()
 
-    def init_functions_for_entitygraph(self,graph,node):
-        self.displayed_field_values = lambda : graph.gen_all_field_names_for_gui(node)
-        #self.displayed_fields = list(node.gen_show_edit_fields())
-        self.replace_field_value = lambda field_name,value,old_value : graph.replace_field_by_old_value_for_gui(node,field_name,value,old_value)
-        self.replace_field_name_and_value  = lambda new_field_name,old_field_name,value,old_value : \
-            graph.replace_field_name_value_by_old_name_value(node,new_field_name,old_field_name,value,old_value)
-        self.immutable_fields =graph.gen_immutable_fields(node)
-        self.get_field = lambda gui_field_name : graph.get_field_or_parent(node,gui_field_name)
-        #self.check_field_name_for_replace = lambda field_name : graph.check_new_field_name_for_replace_for_gui(node,field_name)
-        #self.check_field_name_for_add = lambda field_name : graph.check_new_field_name_for_add_for_gui(node,field_name)
-        self.add_field = lambda  field_name,field_value: graph.add_field_for_gui(node,field_name,field_value)
-        self.remove_field = lambda gui_field_name : graph.remove_field_for_gui(node,gui_field_name)
-        self.update_all_obj = lambda update_dict:graph.update_all_fields_for_gui(node,update_dict)
-        self.valiate_all = self.validate_field_names_for_entity
 
     def init_functions_for_python_object(self,obj):
 
@@ -58,10 +45,8 @@ class ObjectDisplayFrame(tk.Frame):
         class_name_label = tk.Label(self, text=f"Class: {obj.__class__.__name__}")
         class_name_label.pack(side=tk.TOP, pady=5)
 
-
-        # Create a frame for each field
-        #self.field_frames = {}
-        for field_name in self.displayed_field_values():
+        self.immutable_fields = {x for x in self.controller.gen_immutable_fields(obj)}
+        for field_name in self.controller.gen_field_names_for_gui(obj):
             print(f"init : {field_name=}")
             #if not hasattr(obj, field):
             #    raise AttributeError(f"Field '{field}' does not exist in the object.")
@@ -87,32 +72,15 @@ class ObjectDisplayFrame(tk.Frame):
 
 
     def add_new_field(self):
-        #new field name for an entity:
-        new_field_name = "NewField"
-        new_field_value ="NewValue"
-        prefix_field_name = self.add_field(new_field_name, new_field_value)
-        #if not self.check_new_field_name(new_field_name):
-        if prefix_field_name is None:
-            messagebox.showerror("Error", f"Wrong new field name: {new_field_name}")
-            return
-        #if not hasattr(self.obj,new_field_name):
-        #    setattr(self.obj, new_field_name, None)
-        #self.displayed_fields.append(new_field_name)
-
-        #add new field:
-        #prefix_field_name =  self.add_field(new_field_name, new_field_value)
-        #TODO - WORKS ONLY FOR ENTITY:
-        #prefix_field_name = "-" + new_field_name
-        field_frame = ObjectFieldDisplayFrame(self,prefix_field_name)
+        new_prefix_field_name = self.controller. add_new_field_for_gui(self.node)
+        field_frame = ObjectFieldDisplayFrame(self,new_prefix_field_name)
         self.field_frames.append(field_frame)
         field_frame.pack(side=tk.TOP, fill=tk.X, pady=2)
 
     def print_object(self):
         obj = self.node
-        print(f"Object of type: {obj.__class__.__name__}")
-        for field_name in self.displayed_field_values():
-            value =  self.get_field(field_name)# getattr(obj, field)
-            print(f"{field_name}: {value.__class__.__name__}: {value}")
+        print(f" --- Instance of class: {obj.__class__.__name__} ---"  )
+        print(self.controller.dump_field_name_values(obj))
 
     def validate_field_names_for_entity(self):
         dejavu = set()
@@ -125,7 +93,7 @@ class ObjectDisplayFrame(tk.Frame):
                 return False , n, field_name
             dejavu.add(field_name)
             if field_name[0] != "-" and field_name[0] != "+":
-                return False, n, field_name + "field_name[0] or field_name[0]"
+                return False, n, field_name + "field_name[0] is neither - nor +"
             else:
                 if len(field_name) == 1:
                     return False, n, field_name + "len(field_name) == 1"
@@ -138,12 +106,13 @@ class ObjectDisplayFrame(tk.Frame):
 
 
     def update_all_field_names_and_values(self):
+        obj = self.node
         updates_items =[]
         for x in self.field_frames:
             field_name = x.name_var.get().strip()
             field_value = x.value_var.get().strip()
             updates_items.append((field_name,field_value))
-        update_displayed_items = self.update_all_obj(updates_items)
+        update_displayed_items = self.controller.update_all_fields_for_gui(obj,updates_items)
         for (new_field_name,new_value), frame in zip(update_displayed_items,self.field_frames):
             frame.name_var.set(new_field_name)
             frame.value_var.set(new_value)
@@ -180,7 +149,7 @@ class ObjectFieldDisplayFrame(tk.Frame):
             name_entry.bind("<Return>",self.update_all_values)
             name_entry.bind("<KeyRelease>", self.update_all_values)
 
-        value = self.master.get_field(self.field_name) # getattr(self.obj,self.field_name)
+        value = self.master.controller.get_prefixed_field_value(self.master.node,   self.field_name) # getattr(self.obj,self.field_name)
         str_value = self.converter.tostr(value)
         print(f"get_field : {str_value=}")
         self.old_value = value
@@ -263,9 +232,7 @@ class ObjectFieldDisplayFrame(tk.Frame):
             return
 
         # Remove the attribute from the object
-        self.master.remove_field(self.field_name)
-        #delattr(self.obj, self.field_name)
-        #self.master.displayed_fields.remove(self.field_name)
+        self.master.controller.remove_field_for_gui(self.master.node,  self.field_name)
         self.master.field_frames.remove(self)
         self.destroy()
 

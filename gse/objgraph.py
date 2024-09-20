@@ -17,6 +17,10 @@ class ObjNode:
             return f"<{self.value}>"
         #return f"<{self.value}#{self.id}:  {self.children}>"
 
+    def repr_dsize(self):
+        return f"<{self.value};{self.deepsize}>"
+
+
     def add_child(self,child):
         self.children.append(child)
 

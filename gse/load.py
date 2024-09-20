@@ -145,51 +145,48 @@ def loads_indents(lines,
 
 
 def load_one_indent(lines,
-                    inbox_fn,
+                    inbox_header,
+                    #inbox_field,
                     commentchr = "#",
                     alignment = 4,
-                    inverse = False,
+                    #inverse = False,
                     output_root_only = False,
                     child_react = None):
-    known_lines = dict()
-    known_children = set()
+    known_items = dict()
+    known_children_names = set()
     last_item = None
     for raw_line in lines:
         current_level, line = __line_to_level_line__(raw_line, commentchr)
         if not line:
             continue
         assert current_level == 0 or current_level == alignment and last_item is not None, f"load_one_indent : wrong indent {current_level} for {alignment=} for {raw_line=}"
-        item = known_lines.get(line, None)
-        if not item:
-            if inbox_fn:
-                item = inbox_fn(line)
-            else:
-                item = line
-            known_lines[line] = item
+        #item = known_nodes.get(line, None)
+        #if not item:
 
 
 
+        #TODO - error handling with
+        #entitygraph . load_header
         if current_level == 0:
-            if inverse:
-                known_children.add(line)
+            if inbox_header:
+                item,item_name = inbox_header(line)
+            else:
+                item,item_name = line,line
+            assert item_name not in known_items
+            known_items[item_name] = item
             last_item = item
 
         else:
-            if  inverse:
-                if child_react:
-                    child_react(item, last_item)
-
-            else:
-                if child_react:
-                    child_react(last_item, item)
-                known_children.add(line)
-                if not output_root_only:
-                    yield last_item, item
+            if child_react:
+                child_name = child_react(last_item, line)
+            known_children_names.add(child_name)
+            if not output_root_only:
+                yield last_item, child_name
 
     if output_root_only:
-        root_keys =  known_lines.keys() - known_children
+        root_keys =  known_items.keys() - known_children_names
         for root_key in root_keys:
-            yield known_lines[root_key]
+            yield known_items[root_key]
 
 
 

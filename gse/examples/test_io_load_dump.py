@@ -1,5 +1,5 @@
 from gse.objgraph import ObjGraph
-from gse.io import loads,dumps
+from gse.gio import loads,dumps
 
 text = """Item1
     SubItem1 # this is a sub item

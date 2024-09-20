@@ -57,6 +57,22 @@ def dumps_indents(root,
 
 
 
+def dump_entity(entity):
+    if entity.parent is None:
+        header = f"{entity.name}"
+    else:
+        header = f"{entity.name} :{entity.parent}"
+    lines = [header]
+    for sp in entity.sparents:
+        lines.append(  f"+{sp}")
+    for k,v in entity.fields.items():
+        if v is not None:
+            lines.append( f"-{k}: {v}")
+        else:
+            lines.append(f"-{k}")
+    return  "\n\t".join(lines) + "\n"
+
+
 
 
 

@@ -72,14 +72,14 @@ def test_indents_no_inbox_all():
 def test_indents_inbox_root():
     print("--- indents , inbox, root: ---\n")
     #first you need to parse it full :
-    pairs = [pair for pair in loads_indents(lines_ind,
+    roots = [r for r in loads_indents(lines_ind,
                                       inbox_fn=convert_fn_dummy_node,
                                       child_react=child_react_dummy_node,
                                       output_root_only=True)]
 
-    for (parent, child) in pairs:
-        print(" -- !! dump of root !! -- ", child, children_dummy_node(child))
-        for line in dumps_parent_children(child,
+    for root in roots:
+        print(f" -- !! dump of {root} !! -- ", root, "children :", children_dummy_node(root))
+        for line in dumps_parent_children(root,
                                           children_fn=children_dummy_node,
                                           ):
             print(line)

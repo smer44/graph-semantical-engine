@@ -11,6 +11,7 @@ class gCanvasClzItemRenderer:
 
 
     def __header_and_shown_fields_for_entity__(self,entity):
+        #print(f"__header_and_shown_fields_for_entity__ : {entity=}")
         if entity.parent is None:
             header_str = f"{entity.name}"
         else:
@@ -20,7 +21,14 @@ class gCanvasClzItemRenderer:
         return header_str, snown_fields
 
 
+    def __header_and_shown_fields_for_to_str__(self, item):
+        header_str =  f"{str(type(item).__name__)} : {item}"
+        shown_fields = []
+        return header_str,shown_fields
+
+
     def __header_and_shown_fields_for_default__(self, item):
+        #print(f"__header_and_shown_fields_for_default__ : {item=}")
         header_str = str(type(item).__name__)
 
 
@@ -38,6 +46,7 @@ class gCanvasClzItemRenderer:
 
 
     def assert_item_bounds_type(self,item):
+
         return isinstance(item.left,(int,float)) and isinstance(item.bottom,(int,float)) and \
                isinstance(item.right,(int,float)) and isinstance(item.top,(int,float))
 
@@ -47,6 +56,8 @@ class gCanvasClzItemRenderer:
             header_str+=" !! not inboxed"
         elif isinstance(item.value,Entity):
             header_str, shown_fields = self.__header_and_shown_fields_for_entity__(item.value)
+        elif isinstance(item.value,str):
+            header_str, shown_fields = self.__header_and_shown_fields_for_to_str__(item.value)
         else:
             header_str, shown_fields = self.__header_and_shown_fields_for_default__(item.value)
 
@@ -77,15 +88,6 @@ class gCanvasClzItemRenderer:
         ymax+=2
         yheader = ymax
 
-        #rect_id = canvas.create_rectangle(item.left, item.bottom, item.right, item.top, outline='gray', width=2)
-        #item.rect_id = rect_id
-        #htop +=2
-        #step = (item.top - htop) // len(shown_fields)
-        #step_half = step//2
-        #text_mid_x = (item.left + item.right) // 2
-        #text_name_x = (item.left + item.left +item.left +item.right) // 4
-        #text_value_x = (item.left + item.right+ item.right+ item.right) // 4
-        #text_bot = htop+step_half
 
         item.__setattr__("visuals",list())
         #item.visuals.append(header_line_id)

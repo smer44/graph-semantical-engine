@@ -2,7 +2,6 @@ from gse.dictgraph import DictGraph
 from gse.gutil import ViewGraph
 from gse.gio import dumps, load
 
-from gse.examples.dummy_display import ViewNodeDummyDisplay
 
 #dummy graph:
 og = DictGraph()
@@ -12,10 +11,10 @@ a = og.new_node("a")
 b = og.new_node("b")
 ab = og.new_node("ab")
 
-og.add_child(root,a)
-og.add_child(root,b)
-og.add_child(a,ab)
-og.add_child(b,ab)
+og.add_child_by_id(root,a,None)
+og.add_child_by_id(root,b,None)
+og.add_child_by_id(a,ab,None)
+og.add_child_by_id(b,ab,None)
 
 #load graph from file:
 
@@ -50,12 +49,17 @@ import tkinter as tk
 
 root = tk.Tk()
 app = App(root)
-for vnode in nodes:
-    app.canvas.add_item_to_canvas(vnode)
+app.canvas.original_graph = og
+for vnode in nodes: # no, this is view node
+    #print(f"!! {vnode}, {type(vnode)} ,  {vnode.value}, {type(vnode.value)} ")
+    item = vnode#og.values[vnode.value]
+    app.canvas.add_item_to_canvas(item)
     #print("recht_id children: ", vnode.children)
 for vnode in nodes:
+    from_item = vnode#og.values[vnode.value]
     for child in vg.children(vnode):
-        app.canvas.create_arrow(vnode,child)
+        to_item = child#og.values[child.value]
+        app.canvas.create_arrow(from_item,to_item)
 root.mainloop()
 
 
