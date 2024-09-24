@@ -1,4 +1,7 @@
 from tkinter import Canvas, simpledialog, BOTH,LAST
+
+from gse.entitygraph import EntityGraph
+from gse.entitygraphcontroller import EntityGraphController
 from gse.inbox import InboxValue
 from gse.gutil import ViewNode, ViewGraph
 from gse.gCanvasObjItemRender import gCanvasStringItemRenderer
@@ -14,6 +17,7 @@ class GraphCanvas(Canvas):
         self.drag_data = {"x": 0, "y": 0}
         self.viewgraph = None
         self.renderer = gCanvasClzItemRenderer()
+        self.controller = EntityGraphController()
         self.bind("<ButtonPress-1>", self.on_button_press)
         self.bind("<B1-Motion>", self.on_mouse_drag)
         self.bind("<ButtonRelease-1>", self.on_button_release)
@@ -25,7 +29,7 @@ class GraphCanvas(Canvas):
 
         # Store the start position of the drag
         self.middle_drag_data = {"x": 0, "y": 0}
-
+        self.original_graph = None
         self.create_counter = 0
         self.last_item = None
         self.last_event = None
@@ -310,6 +314,8 @@ class GraphCanvas(Canvas):
         #text_var = InboxValue(f"New Item {self.create_counter}")
         #TODO - this must be changed to creating a node out of text value
         value = f"New Item {self.create_counter}"
+        if self.original_graph is None:
+            self.original_graph = EntityGraph()
         new_item = self.viewgraph.new_inboxed_node(self.original_graph,value)
 
         new_item.set_coords(x+dx0, y+dy0, x + dx1, y + dy1)

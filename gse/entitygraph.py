@@ -26,7 +26,7 @@ class Entity:
         Entity.id_counter = idn+1
 
     def __repr__(self):
-        return f"{self.idn=}.{self.name}"
+        return f"{self.idn}.{self.name}"
 
     def __str__(self):
         return f"{self.name}"
@@ -38,6 +38,9 @@ class EntityGraph:
     def __init__(self):
         self.entities = []
         self.entities_dict = dict()
+        self.new_node = self.get_or_create_node
+        #self.get_value = lambda node_name : self.entities_dict[node_name]
+        self.get_value = lambda entity: entity
 
     def set_field(self,node,field,value):
         node.fields[field]  = value
@@ -55,6 +58,9 @@ class EntityGraph:
             if entity.parent is None:
                 assert not entity.sparents, f"gen_roots : {entity=} has secondary parents but not main parent"
                 yield entity
+            #else:
+            #    parent = self.get_or_create_node(entity.parent,True)
+            #    yield parent
 
     def gen_primary_roots(self):
         dejavu = set()
@@ -78,14 +84,17 @@ class EntityGraph:
         parents = []
         if len(name_parents) == 2:
             name, parents_row = name_parents
-            name = name.strip()
+        else:
+            name, parents_row = name_parents[0], None
+        name = name.strip()
+        entity = self.get_or_create_node(name)
+        if parents_row:
             for x in parents_row.split(split_between_parents):
                 parent_name = x.strip()
                 if parent_name:
                     parents.append(parent_name)
-        else:
-            name = name_parents[0]
-        entity = self.get_or_create_node(name)
+                    parent = self.get_or_create_node(parent_name, True)
+                    parent.children.append(entity)
         self.set_parents(entity,parents)
         return entity, name
 
@@ -100,16 +109,36 @@ class EntityGraph:
             node.sparents = parents[1:]
 
 
-    def add_parent(self, node, parent):
+    def add_parent(self, node, parent_name):
         #assert node not in parent.children
-        assert isinstance(parent,str)
-        if not node.parent:
-            node.parent = parent
-            #parent.children.append(node)
-            return
+        assert isinstance(parent_name,str)
+        assert parent_name != node.parent and parent_name not in node.sparents, f"add_parent: to {node=} ,adding {parent_name=} the second time"
 
-        assert parent != node.parent and parent not in node.sparents
-        node.sparents.append(parent)
+        if not node.parent:
+            node.parent = parent_name
+            #parent.children.append(node)
+        else:
+            node.sparents.append(parent_name)
+        parent_entity = self.get_or_create_node(parent_name,True)
+        parent_entity.children.append(node)
+
+
+
+    def get_node(self,id_dot_name):
+        spl = id_dot_name.split(".")
+        if len(spl) == 1:
+            idn, name = None, spl[0]
+        elif len(spl) ==2:
+            idn, name = spl
+        if idn is None:
+            return self.entities_dict[name]
+        else:
+            idn = int(idn)
+            node = self.entities[idn]
+            node2 = self.entities_dict[name]
+            assert node is node2 , f"get_node: id and node name mismatch for {id_dot_name}"
+            return node
+
 
 
 
@@ -129,7 +158,7 @@ class EntityGraph:
                 assert idn is None or node.idn == idn, f"EntityGraph.new_node_from_str : wrong  {idn=} for {node=}"
                 return node
 
-        assert name not in self.entities_dict, f"EntityGraph.new_node_from_str : entity with name {name} already exists"
+        assert name not in self.entities_dict, f"EntityGraph.new_node_from_str : entity with {name=} already exists"
         node = Entity(name,idn)
         self.entities.append(node)
         self.entities_dict[name] = node
@@ -141,6 +170,11 @@ class EntityGraph:
             return self.children_edge(node, "-")
         return node
 
+
+    def fields_values_if_entity_else_none(self,node):
+        if isinstance(node, Entity):
+            return [self.fields_names_if_entity(ename)  for ename in self.children_edge(node, "-") ]
+        return None
 
     def children_edge(self,node,edge= None):
         if edge is None:

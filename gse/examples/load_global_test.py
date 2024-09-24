@@ -1,6 +1,7 @@
 from pathlib import Path
 
-from gse import load,dumps
+from gse.gio import load
+from gse.dump import dumps
 
 
 print("-- Load into DictGraph with inboxing of values ")

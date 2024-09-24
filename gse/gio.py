@@ -15,7 +15,7 @@ def load(file,format = "indents", gtype = "dict"):
 
 
 
-def load_entities_with_fields(lines):
+def load_entities_with_fields(lines,debug = False):
     eg = EntityGraph()
     inbox_header = eg.load_header
     #inbox_field = eg.load_field
@@ -28,6 +28,7 @@ def load_entities_with_fields(lines):
                                         #inverse=True,
                                         output_root_only=output_root_only,
                                         child_react=child_react,
+                                        debug= debug
                                                  )
              ]
 

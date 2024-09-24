@@ -151,12 +151,21 @@ def load_one_indent(lines,
                     alignment = 4,
                     #inverse = False,
                     output_root_only = False,
-                    child_react = None):
+                    child_react = None,
+                    debug = False):
+    if debug:
+        print(" - - - load_one_indent debug- - -")
+        print(f"{inbox_header=}")
+        print(f"{child_react=}")
+        print(f"{output_root_only=}")
+
     known_items = dict()
     known_children_names = set()
     last_item = None
     for raw_line in lines:
         current_level, line = __line_to_level_line__(raw_line, commentchr)
+        if debug:
+            print(f"{current_level=}, {line=}")
         if not line:
             continue
         assert current_level == 0 or current_level == alignment and last_item is not None, f"load_one_indent : wrong indent {current_level} for {alignment=} for {raw_line=}"
@@ -172,12 +181,16 @@ def load_one_indent(lines,
                 item,item_name = inbox_header(line)
             else:
                 item,item_name = line,line
+            if debug:
+                print(f"inbox_header: {item=}, {item_name=}, is in known_items : {item_name in known_items}")
             assert item_name not in known_items
             known_items[item_name] = item
             last_item = item
 
         else:
             if child_react:
+                if debug:
+                    print(f"child_react {last_item=}, {line=}")
                 child_name = child_react(last_item, line)
             known_children_names.add(child_name)
             if not output_root_only:
@@ -186,7 +199,10 @@ def load_one_indent(lines,
     if output_root_only:
         root_keys =  known_items.keys() - known_children_names
         for root_key in root_keys:
-            yield known_items[root_key]
+            root_item = known_items[root_key]
+            if debug:
+                print(f"yield {root_item=}")
+            yield root_item
 
 
 

@@ -56,13 +56,14 @@ class EntityGraphController:
 
 
 
-    def get_all_fields_and_values_dict_deprecated(self,entity):
-        ret = dict()
-        ret[f"++{entity.parent}"]= entity.parent
+    def gen_field_names_values_for_gui(self,entity):
+        ret = []
+        ret.append((f"++{entity.parent}", f"{entity.parent}"))
+        #ret[f"++{entity.parent}"]= entity.parent
         for sp in entity.sparents:
-            ret[f"+{sp}"] = f"{sp}"
+            ret.append((f"+{sp}", ""))
         for k,v in entity.fields.items():
-            ret[f"-{k}"]  = f"{v}"
+            ret.append((f"-{k}",  f"{v}"))
         return ret
 
     def replace_field_by_old_value_deprecated(self,entity,prefix_field_name, value,old_value):

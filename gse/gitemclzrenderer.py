@@ -10,14 +10,14 @@ class gCanvasClzItemRenderer:
 
 
 
-    def __header_and_shown_fields_for_entity__(self,entity):
+    def __header_and_shown_fields_for_entity__(self,controller,entity):
         #print(f"__header_and_shown_fields_for_entity__ : {entity=}")
         if entity.parent is None:
             header_str = f"{entity.name}"
         else:
-            header_str = f"{entity.name} :{entity.parent.name}"
+            header_str = f"{entity.name} : {entity.parent}"
 
-        snown_fields = [x for x in entity.gen_shown_fields()]
+        snown_fields = [x  for x in controller.gen_field_names_values_for_gui(entity)]
         return header_str, snown_fields
 
 
@@ -51,11 +51,12 @@ class gCanvasClzItemRenderer:
                isinstance(item.right,(int,float)) and isinstance(item.top,(int,float))
 
     def create_visual_item(self, canvas,item):
+        controller = canvas.controller
         if not hasattr(item, "value"):
             header_str, shown_fields = self.__header_and_shown_fields_for_default__(item)
             header_str+=" !! not inboxed"
         elif isinstance(item.value,Entity):
-            header_str, shown_fields = self.__header_and_shown_fields_for_entity__(item.value)
+            header_str, shown_fields = self.__header_and_shown_fields_for_entity__(controller, item.value)
         elif isinstance(item.value,str):
             header_str, shown_fields = self.__header_and_shown_fields_for_to_str__(item.value)
         else:

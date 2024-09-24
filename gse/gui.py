@@ -144,8 +144,12 @@ class App:
                 else:
                     format = "indents"
                 og, roots = load_lines(lines,format,gtype="dict")
+                if not roots:
+                    print("--- EMPTY Graph loaded: ---")
+                    return
+
                 print("--- Graph loaded: ---")
-                print(dumps(og,roots[0], inbox = False))
+                #print(dumps(og,roots[0], inbox = False))
                 #TODO currently, loading pure graph and then creates a viewgraph
                 #og, roots = load(file_graph)
                 vg = ViewGraph()
@@ -155,7 +159,7 @@ class App:
                 vg.place_stretch_min(vg.roots, 10, 20, 800 - 10, 600 - 20, 3, 200,100)
                 vg.finalize_places()
                 self.canvas.delete_all()
-                self.canvas.reset_graph(vg)
+                self.canvas.reset_graph(og,vg)
 
             self.file_name_graph = file_name_graph
             self._print_to_filename_bar(file_name_graph)
