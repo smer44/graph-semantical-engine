@@ -33,6 +33,7 @@ class GraphCanvas(Canvas):
         self.create_counter = 0
         self.last_item = None
         self.last_event = None
+        self.tasks_after = None
 
     def create_default_items(self):
         # Initialize some Item objects
