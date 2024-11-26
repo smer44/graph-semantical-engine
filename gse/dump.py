@@ -124,7 +124,9 @@ def __dump_indents_entity__(graph,entity,indent,addprefix,first_indent,lines,dee
             field_first_indent = f"{next_indent}-{k} : "
             if v is not None:
                 #lines.append( f"{prefix}-{k}: {v}")
-                next_obj = graph.entities_dict.get(v, v)
+                #if not isinstance(v,list):
+                #    next_obj = graph.entities_dict.get(v, v)
+                #else
                 __dumps_indents_decide__(graph, v, next_indent, addprefix, field_first_indent, lines, next_deep_sparents, next_deep_fields)
             else:
                 lines.append(field_first_indent)

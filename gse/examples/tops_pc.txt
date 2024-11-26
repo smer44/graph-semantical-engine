@@ -2,7 +2,7 @@ Entity:SingleEntity,Collection
 SingleEntity:RealEntity,FormalEntity#disjoint
 RealEntity:Object,Action,Relation#disjoint
 Object:PhysicalObject,AssumedObject,InfoObject
-PhysicalObject:ObjectByPhysicalTrait,ObjectByOrigin,ObjectByFunctionality,ObjectByItsAction
+PhysicalObject:ObjectByPhysicalTrait,ObjectByOrigin,ObjectByFunctionality,ObjectByItsCurrentAction,SpaceSelection
 ObjectByPhysicalTrait:ObjectByStructure,ObjectByCapability,ObjectBySize,ObjectBySurface
 ObjectByStructure:ObjectByInnerOrdering,ObjectByComposition
 ObjectByInnerOrdering:InnerOrderedObject,ConglomerationObject#disjoint
@@ -27,20 +27,53 @@ ActiveObject:NaturalActiveLivingObject
 OrganicalObject:NaturalActiveLivingObject
 NaturalObject:NaturalActiveLivingObject
 
-AssumedObject:JuraObject
+AssumedObject:JuraObject,GeoPoliticalObject
+GeoPoliticalObject:Country
+JuraObject:EconomyObject
+EconomyObject:Firm
 
-ObjectByFunctionality : InfoRepresentationObject, UsedByShapeObject,UsedByActivenessObject ,UsedByInnerActivenessObject
+
+ObjectByFunctionality : InfoRepresentationObject, UsedByShapeObject,UsedByActivenessObject ,UsedByInnerActivenessObject,UsedAsAssigned
 InfoRepresentationObject:InfoObjectByRepresentationType
 InfoObjectByRepresentationType: AnalogyInfoReprObject,SymbolicalInfoReprObject
 AnalogyInfoReprObject:Image,Scuplture
 SymbolicalInfoObject:TextObject
-UsedByShapeObject:Furniture,BuildingBlockBeforePlacement,ToolUsedByShape
+UsedByShapeObject:Furniture,BuildingOrBuildingBlock,ToolUsedByShape
 ToolUsedByShape:Hammer
 UsedByActivenessObject:UsedBySelfMovementObject,UsedByOuterPartMovementObject
 UsedBySelfMovementObject:Vehicle,Сourier
 UsedByOuterPartMovementObject : Mechanism
 UsedByInnerActivenessObject: Device
 Device:Printer,Monitor
+BuildingOrBuildingBlock:Building, BuildingBlock
+UsedAsAssigned: PlaceUsedAsAssigned
+PlaceUsedAsAssigned:TransportHub,Dwelling,Shop
+TransportHub : VehicleStation, Port,Airport
+
+
+ObjectByItsCurrentAction:ObjectByItsCommunicationAction
+ObjectByItsCommunicationAction:ObjectByItsDialogueAction, ObjectByItsLearnProcessAction,ObjectByItsBusinessInteractionAction
+ObjectByItsDialogueAction:  DialogueParticipant, DialogueMiddleman
+ObjectByItsLearnProcessAction: TeacherByAction, StudentByAction
+ObjectByItsBusinessInteractionAction : Client
+
+# -- Action --
+
+Action:ActienceOrNotAction,  ActionByCausedResult, ActionByActionPart, SpaceTimeSelection
+ActienceOrNotAction : NaturalHappening,ActienceAction
+NaturalHappening:NaturalHappeningOfSurrounding
+NaturalHappeningOfSurrounding : WeatherAction
+ActionByCausedResult: MoveObjectResultAction, ModifyObjectResultAction
+MoveObjectResultAction: MoveOther, MoveSelf
+
+ActionByActionPart: BeginAction, ContinueAction, EndAction
+
+Begin : TakeMoveOther
+End : PutMoveOther
+MoveOther: TakeMoveOther,PutMoveOther
+
+
+
 
 
 

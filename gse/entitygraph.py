@@ -31,7 +31,31 @@ class Entity:
     def __str__(self):
         return f"{self.name}"
 
+    def set(self,**kwargs):
+        self.fields.update(kwargs)
 
+    def add_parents_wrong(self,*parents):
+        for parent_name in parents:
+            # assert node not in parent.children
+            assert isinstance(parent_name, str)
+            assert parent_name != self.parent and parent_name not in self.sparents, f"add_parent: to {self=} ,adding {parent_name=} the second time"
+
+            if not self.parent:
+                self.parent = parent_name
+                # parent.children.append(node)
+            else:
+                self.sparents.append(parent_name)
+            parent_entity = self.get_or_create_node(parent_name, True)
+            parent_entity.children.append(self)
+
+
+
+    def append(self,**kwargs):
+        for k,v in kwargs.items():
+            row = self.fields.setdefault(k,[])
+            if not isinstance(row, list):
+                row = list(row)
+            row.append(v)
 
 class EntityGraph:
 
@@ -45,6 +69,11 @@ class EntityGraph:
     def set_field(self,node,field,value):
         node.fields[field]  = value
         return value
+
+    def set_fields(self,node,**kwargs):
+        node.fields.update(kwargs)
+
+
 
     def gen_roots(self):
         """

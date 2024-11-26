@@ -1,0 +1,253 @@
+### Model for Character Behavior in a Narrative-based Simulation Game
+
+#### 1. **Situations** (broad and detailed):
+A character is always in multiple situations at once. These situations influence the priority of actions by contributing "weights" to the action's motivation.
+
+##### Broad Situations:
+- **Location-based**:
+  - **In a public place** (e.g., park, street, office).
+  - **In a private space** (e.g., home, a friend's house).
+  - **At an event** (e.g., party, cinema, lecture).
+
+- **Time-based**:
+  - **Morning**, **Afternoon**, **Evening**, **Night**.
+  - **During work hours**, **On a weekend**, **During vacation**.
+
+- **Social-based**:
+  - **With friends**, **With strangers**, **With colleagues**.
+  - **In a group**, **One-on-one**.
+
+- **Emotional state**:
+  - **Feeling happy**, **Feeling sad**, **Feeling stressed**, **Feeling angry**.
+
+- **Relationship-based**:
+  - **In a friendly relationship**, **In a romantic relationship**, **In a rivalry**.
+
+##### Detailed Situations (subclasses of broad situations):
+- **In a conflict** (subcategory of **Social-based**):
+  - **Verbal argument** (e.g., disagreement, confrontation).
+  - **Silent treatment** (e.g., ignoring or avoiding).
+
+- **At an event**:
+  - **At a party** (subcategory of **At an event**).
+  - **At a movie** (subcategory of **At an event**).
+
+- **Mood-based**:
+  - **Feeling excited**, **Feeling anxious**, **Feeling depressed** (subcategories of **Emotional state**).
+
+- **Specific moment situations**:
+  - **Has a deadline** (applies to work or study tasks).
+  - **Receives a phone call**.
+  - **Sees someone they dislike**.
+
+#### 2. **Actions** (typical):
+Actions are context-sensitive but can occur in various situations. Actions are weighed based on how well they align with the character's current situations.
+
+- **Social interaction actions**:
+  - **Greet** (in public places or with friends).
+  - **Ask for help** (when in a problem situation).
+  - **Start a conversation**, **Give a compliment**, **Apologize**.
+
+- **Conflict actions**:
+  - **Confront**, **Defend**, **Walk away**, **Negotiate**, **Apologize**.
+
+- **Work/study actions**:
+  - **Complete a task**, **Procrastinate**, **Ask for help**, **Ignore the task**.
+
+- **Recreational actions**:
+  - **Watch a movie**, **Dance** (at a party), **Talk to a stranger**, **Leave the event**.
+
+- **Romantic actions**:
+  - **Flirt**, **Ask for a date**, **Express affection**, **Ignore**.
+
+#### 3. **Variables**:
+These variables influence the weight assigned to actions by adding or subtracting from the action’s base motivation:
+
+- **Mood**: Dynamic variable that changes based on events.
+  - Examples: **Happy**, **Angry**, **Anxious**, **Relaxed**.
+
+- **Personality traits**: Static traits defining the character’s baseline preferences and behavior.
+  - Examples: **Introverted**, **Extroverted**, **Aggressive**, **Cautious**, **Curious**.
+
+- **Relationships**: Dynamic and evolving over time, influencing actions.
+  - **Friendship level** (e.g., trust, closeness), **Rivalry level**, **Romantic interest**.
+
+- **Physical state**:
+  - **Health**: Influences ability to engage in physical actions.
+  - **Fatigue**, **Hunger**: Influence choices when it comes to recreational or task-related actions.
+
+- **Long-term goals** (also treated as ongoing situations):
+  - **Career goals**, **Personal goals** (e.g., "Become popular", "Achieve a promotion").
+
+- **Environment**:
+  - **Crowdedness**, **Noise level**, **Climatic conditions**.
+
+#### 4. **Priority Assigner**:
+The priority assigner calculates the motivation score for each action by summing up the influence of all applicable situations, variables, and character traits.
+
+##### Steps for calculating priority:
+1. **Identify relevant situations**: Based on current time, location, and context, all applicable situations are identified.
+   - Example: If a character is in a public place with friends during the evening, the relevant situations might be:
+     - "In a public place"
+     - "With friends"
+     - "Evening"
+     - "Feeling happy"
+
+2. **Evaluate possible actions**: For each action, determine its relevance to the current situations.
+   - Actions like **chatting**, **going for a drink**, and **flirting** are more relevant in this situation than **working** or **defending**.
+
+3. **Calculate motivation**: Sum up the weight for each action by:
+   - Adding the weight of relevant situations.
+   - Applying modifiers based on character traits (e.g., an extroverted character might get a boost to social actions, while an introverted character would not).
+   - Adding influences from physical states (e.g., if the character is tired, they might lose motivation to attend a party).
+
+4. **Choose the highest motivation action**: The action with the highest motivation score is chosen.
+
+##### Formula for motivation score:
+\[
+M(action) = \sum (weights \, of \, situations) + modifiers \, based \, on \, variables
+\]
+Where:
+- **Situations** add weight based on their relevance.
+- **Character traits** adjust the weights (e.g., extroversion amplifies social actions).
+- **Physical state** adds or subtracts weight (e.g., fatigue reduces motivation for physical actions).
+
+### Example:
+- A character in a public place with friends in the evening, feeling happy and being an extrovert, might have the following situation weights:
+  - "In a public place" (+2 to social actions).
+  - "With friends" (+3 to social actions).
+  - "Evening" (+1 to social or leisure actions).
+  - "Feeling happy" (+2 to all actions).
+
+If the character can choose between **chatting** or **working**, the motivation for **chatting** would be higher due to the situational bonuses.
+
+---
+
+This provides a flexible framework where both broad and specific situations influence actions, and character-specific traits, relationships, and dynamic conditions like mood are taken into account. Let me know if you'd like to expand on any part of this or add more specific details!
+
+
+----
+
+### Theoretical Model for Character Behavior System
+
+Based on your clarified details, here’s how I would structure the model:
+
+### 1. **Situations**
+
+Situations provide a context for action and influence the character’s behavior by assigning weights. There are **broad situations** (general context) and **detailed situations** (specific conditions). The character is always in multiple situations at once, with their combined weights summing up to influence action priority.
+
+#### Broad Situations:
+- **Location-based**:
+  - **In public place** (broad): e.g., in a park, at a party.
+  - **In private place** (broad): e.g., at home, in a private meeting.
+- **Social status**:
+  - **Alone** (broad): No one else around.
+  - **With friends** (broad): Socializing with known characters.
+  - **With strangers** (broad): Meeting new people, uncertain interactions.
+- **Time-based**:
+  - **Morning** (broad): Start of the day.
+  - **Evening** (broad): Wind-down time.
+  - **Night** (broad): End of the day.
+
+#### Detailed Situations:
+- **Conflict with a character**: Ongoing rivalry or argument.
+- **Character has bad mood**: Their emotional state weighs heavily on actions.
+- **At a party with friends**: Specific social event context.
+- **Is feeling hungry**: Physical need.
+- **Is assigned a long-term goal**: e.g., "improve relationship with X" or "gain promotion."
+
+**Existence Markers**: Some situations are triggered at specific points in time and disappear once their condition ends (e.g., “attending a meeting at 10 AM”).
+
+### 2. **Actions**
+
+Actions represent what a character can perform in each situation. These are flexible, and a character's choice is based on the situation and other influencing factors like mood or personality.
+
+#### Sample Actions:
+- **Social interaction**:
+  - **Greet**: Initiating interaction with another character.
+  - **Make joke**: Attempt to lighten the mood or build rapport.
+  - **Insult**: Causing a negative social impact.
+  - **Flirt**: Romantic interaction.
+- **Task-related**:
+  - **Study**: Focus on learning or academic work.
+  - **Work**: Perform professional tasks.
+  - **Take a break**: Relax during or after work.
+- **Conflict resolution**:
+  - **Apologize**: Resolve conflict peacefully.
+  - **Escalate**: Take a more aggressive or confrontational approach.
+  - **Walk away**: Leave the situation.
+- **Physical needs**:
+  - **Eat**: Satisfy hunger.
+  - **Sleep**: Rest to regain energy.
+
+### 3. **Variables**
+
+Variables are dynamic factors that adjust the character’s priorities and motivation. These include personality traits, emotional state, relationships, and physical conditions.
+
+- **Personality traits**:
+  - **Introverted vs Extroverted**: Affects social interactions (e.g., an introvert may avoid parties).
+  - **Aggressive vs Calm**: Influences how conflicts are handled.
+  - **Risk-taking vs Cautious**: Impacts decisions in crises or uncertain situations.
+
+- **Mood** (Emotional state):
+  - **Happy**: Boosts social actions and positive interactions.
+  - **Angry**: Pushes toward aggressive or confrontational actions.
+  - **Sad**: Leads to withdrawal or avoidance.
+  - **Anxious**: Increases likelihood of cautious actions or avoidance.
+
+- **Relationships** (Dynamic):
+  - **Friendship**: High trust and positive interactions.
+  - **Rivalry**: Competitive or confrontational behavior.
+  - **Romantic interest**: Leads to flirtation, attention, or care.
+
+- **Physical needs**:
+  - **Hunger**: May interrupt other actions to satisfy food cravings.
+  - **Fatigue**: Lowers motivation for tasks and increases likelihood of rest.
+
+- **Long-term goals**:
+  - **Career progression**: Increases motivation for work-related actions.
+  - **Relationship building**: Guides social interactions toward certain individuals.
+
+### 4. **Priority Assigner (Motivation Calculation)**
+
+The priority assigner calculates motivation for each action by taking the current **situation set**, the **available actions**, and the **character’s variables**. Each situation and variable has a predefined **weight**.
+
+- **Motivation Score (M)**:
+  \[
+  M(A) = \sum \text{Weight}_{\text{Situation}} + \sum \text{Weight}_{\text{Variable}}
+  \]
+  Where \( A \) is the action being considered, and the weights are assigned based on the context. For instance:
+  - If the character is **hungry** (a situation), eating actions will have a high weight.
+  - If the character is in a **public place** with friends, social actions will have a higher weight.
+  - The character’s **mood** (e.g., angry) might raise the priority of confrontational actions.
+
+#### Example Calculation:
+Character in the following situations:
+- **Is in public place**: (+3 to social actions)
+- **Has conflict with character**: (+5 to aggressive actions)
+- **Is hungry**: (+6 to eating actions)
+- **Mood is angry**: (+4 to aggressive actions)
+
+Available actions:
+- **Greet**: Social action (+3 from public place).
+  - Total weight: \( 3 \)
+- **Insult**: Aggressive action (+5 from conflict, +4 from angry mood).
+  - Total weight: \( 9 \)
+- **Eat**: Physical need action (+6 from hunger).
+  - Total weight: \( 6 \)
+
+Here, **Insult** has the highest motivation score (9), so the character would prioritize this action in the current set of situations.
+
+### 5. **Hardcoded Actions and Long-Term Situations**
+
+Some actions must be hardcoded to ensure they happen at specific times (e.g., key story events). These actions may override the calculated motivation temporarily. Long-term goals function like constant background situations, continuously influencing action motivation (e.g., "gain promotion" constantly affecting work-related decisions).
+
+### Conclusion:
+
+This model provides a flexible, modular way to define character behavior, with the ability to combine broad and detailed situations, dynamic variables, and a priority assigner to drive action selection. Characters will behave realistically, influenced by their environment, mood, and relationships, while also pursuing long-term goals and performing hardcoded actions for narrative progression.
+
+
+---
+
+
+
