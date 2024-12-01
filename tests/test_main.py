@@ -1,8 +1,4 @@
 from io import StringIO
-
-import pytest
-
-from gse.gol import Gol
 from gse.objgraph import ObjGraph
 
 

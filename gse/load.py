@@ -1,3 +1,92 @@
+load_debug = True
+def loads_parent_child(lines,
+                       inbox_fn = None,
+                       splitchr = ":",
+                       commentchr = "#",
+                       inverse = True,
+                       output_root_only = False,
+                       child_react = None,
+                       is_tree  = False,# if True, a node can be a child only once.
+                       one_root = True,
+                       #unique_pairs_check = True,# if True, checks if there are no double pairs parent + child
+                       max_lines = -1):
+    global load_debug
+    values_to_nodes_dict = dict()
+    known_children = set()
+    known_pairs = set()
+    line_counter = -1
+    for raw_line in lines:
+        line_counter +=1
+        if max_lines >= 0 and line_counter>=max_lines:
+            break
+        line = raw_line.strip()
+        if line:
+            line = line.split(commentchr)[0]
+            if line:
+                parent_children_split = line.split(splitchr)
+                assert len(parent_children_split) == 2
+                parent_text, child_text = parent_children_split
+                parent_text = parent_text.strip()
+                assert parent_text
+                child_text = child_text.strip()
+                assert child_text
+                if inverse:
+                    parent_text, child_text = child_text, parent_text
+
+                #if unique_pairs_check:
+                pair_line = parent_text + child_text
+                assert pair_line not in known_pairs, f"loads_parent_child: line {line_counter} :{line}: ERROR: repeated parent-child pair"
+                known_pairs.add(pair_line)
+
+                if is_tree:
+                    #known_child = known_children.get(child_text,None)
+                    assert child_text not in  known_children, f"loads_parent_child: line {line_counter}:{line}: ERROR: repeated child while loading a tree"
+                known_children.add(child_text)
+
+                parent = values_to_nodes_dict.get(parent_text,None)
+                if parent is  None:
+                    if inbox_fn:
+                        parent = inbox_fn(parent_text)
+                    else:
+                        parent = parent_text
+                    values_to_nodes_dict[parent_text] = parent
+
+
+                child = values_to_nodes_dict.get(child_text,None)
+                if child is  None:
+                    if inbox_fn:
+                        child = inbox_fn(child_text)
+                    else:
+                        child = child_text
+                    values_to_nodes_dict[child_text] = child
+
+                if child_react:
+                    child_react(parent,child)
+                if not output_root_only:
+                    yield parent, child
+    if output_root_only:
+        if load_debug:
+            print(f"{values_to_nodes_dict.keys()=} , {known_children=}")
+        roots = values_to_nodes_dict.keys() - known_children
+        if load_debug:
+            print(f"{roots=}")
+        if one_root:
+            assert len(roots) == 1 , f"loads_parent_child: entire data ERROR: too many main roots found : {roots}"
+        for root in roots:
+            yield  values_to_nodes_dict[root]
+
+
+
+
+
+
+
+
+
+
+
+
+
 def loads_parent_children(lines,
                          inbox_fn = None,
                          splitchr = ":",
@@ -60,7 +149,7 @@ def loads_parent_children(lines,
                                 yield parent, child
         line_counter +=1
     if output_root_only:
-        print(f"{known_children=}")
+        #print(f"{known_children=}")
         roots = values_to_nodes_dict.keys() - known_children
         #at last , yield only roots:
         for root in roots:

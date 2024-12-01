@@ -53,7 +53,11 @@ class EntityGraphController:
             yield f"-{k}"
 
 
-
+    def gen_secondary_field_name_values(self,entity):
+        for sp in entity.sparents:
+            yield f"+{sp}"
+        for k in entity.fields:
+            yield f"-{k}:{entity.fields[k]}"
 
 
     def gen_field_names_values_for_gui(self,entity):

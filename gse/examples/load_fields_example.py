@@ -1,6 +1,6 @@
 from gse.load import load_one_indent
 from gse.entitygraph import EntityGraph
-from gse.dump import dumps_indents , dump_entity
+from gse.dump import dumps_indents #, dump_entity
 from gse.gio import load_entities_with_fields
 
 text = """
