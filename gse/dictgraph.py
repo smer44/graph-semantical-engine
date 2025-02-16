@@ -13,9 +13,24 @@ class DictGraph:
         #self.unique_values= true
         self.children_edge = self.children_by_id_and_edge
         self.children = self.children_by_id_all
+        self.root_node_ids = []
         self.dumps = lambda node: dumps_indents(node,
-                                                self.children,
+                                                children_fn = self.children,
+                                                shallow_str = lambda id: self.values[id]
                                                 )
+    def dumps_roots(self):
+        lines = []
+        for root_node_id in self.root_node_ids:
+            for line in self.dumps(root_node_id):
+                lines.append(line)
+        return "\n".join(lines)
+
+    def replace_value(self,old_value,new_value):
+        id = self.ids[old_value]
+        del self.ids[old_value]
+        self.ids[new_value] = id
+        self.values[id] = new_value
+
     def new_node(self,value, id = None):
         """
         Creates a node inside a dictgraph about a value
@@ -32,9 +47,11 @@ class DictGraph:
         self.max_id = max (id+1,self.max_id)
         self.values[id] = value
         self.ids[value] = id
+        self.root_node_ids.append(id)
         return id
 
     def get_value(self,id):
+        assert isinstance(id,int), f"DictGraph.get_value : wrong: {id=} , {type(id)=}"
         return self.values[id]
 
     def add_child_by_id(self,parent,child, edge= None):
@@ -44,6 +61,9 @@ class DictGraph:
         row.add(child)
         row = self.node_node_edges.setdefault((parent, child), set())
         row.add(edge)
+        #if parent != child:
+        #    assert child in self.root_node_ids, f"dictgraph.add_child_by_id, not it roots = {self.root_node_ids}: {child=}"
+        #    self.root_node_ids.remove(child)
 
     def add_child_by_value(self, parent, child, edge):
         parent_id = self.ids[parent]
@@ -85,6 +105,12 @@ class DictGraph:
 
     def children_by_id_and_edge(self,id,edge):
         assert isinstance(id, int) , f"children_by_id_and_edge: id is not an int: {id=}"
+        return self.node_edge_nodes.get((id,edge), None)
+
+    def children_by_value_and_edge(self,value,edge):
+
+        id = self.ids[value]
+        assert isinstance(id, int), f"children_by_id_and_edge: id is not an int: {id=}"
         return self.node_edge_nodes.get((id,edge), None)
 
 

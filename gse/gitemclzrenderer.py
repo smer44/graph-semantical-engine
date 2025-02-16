@@ -1,3 +1,4 @@
+from gse.dictgraph import DictGraph
 from gse.entitygraph import Entity
 
 
@@ -161,9 +162,25 @@ class gCanvasClzItemRenderer:
                 canvas.move(visual_item,dx,dy)
 
 
-    def update_text_on_item(self,canvas, item, text):
-        item.value.set(text)
-        canvas.itemconfig(item.text_id, text=str(item.value))
+    def update_text_on_item(self, canvas, item, text):
+        original_graph = canvas.original_graph
+        print(f"called {item=} , {text=}")
+        old_value = item.value
+
+        if isinstance(item.value, str):
+            item.value = text
+        else:
+            item.value.set(text)
+        if isinstance(original_graph, DictGraph):
+            original_graph.replace_value(old_value,text)
+        else:
+            assert False , f" update_text_on_item unfinished for graph type {type(original_graph)}"
+        if 2 == len(item.visuals):
+            #this is primitive value
+            canvas_object_id = item.visuals[0]
+            canvas.itemconfig(canvas_object_id, text=str(item.value))
+        else:
+            assert False, f" update_text_on_item unfinished for item type {type(item.value)} , {item.visuals=}"
 
 
 

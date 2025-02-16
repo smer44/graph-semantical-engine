@@ -8,8 +8,9 @@ from gse.gCanvasObjItemRender import gCanvasStringItemRenderer
 from gse.gitemovalrenderer import gCanvasStringOvalItemRenderer
 from gse.gitemclzrenderer import gCanvasClzItemRenderer
 class GraphCanvas(Canvas):
-    def __init__(self,tk_root,width,height):
+    def __init__(self,tk_root,app,width,height):
         super().__init__(tk_root,  width=width, height=height,bg='white')
+        self.app = app
         self.pack(fill=BOTH, expand=True)
         self.selected_items = dict()
         self.selected_for_connect = None
@@ -302,7 +303,9 @@ class GraphCanvas(Canvas):
 
             new_text = simpledialog.askstring("Input", "Edit text:", initialvalue=str(item.value))
             if new_text:
-                self.renderer.update_text_on_item(self,item,new_text)
+                self.renderer.update_text_on_item(self, item,new_text)
+                if self.app:
+                    self.app.update_text()
 
 
     def create_new_item(self, x, y):

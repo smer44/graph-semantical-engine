@@ -1,6 +1,6 @@
 import tkinter as tk
 
-from tkinter import simpledialog
+from tkinter import simpledialog, LEFT, Y, RIGHT, END
 from gse.gutil import ViewNode
 from gse.gio import load,load_lines,dumps
 from gse.gutil import ViewGraph
@@ -22,6 +22,7 @@ class GraphToView:
     def __init__(self):
         self.add_edge = self.__add_edge_view_item__
         self.to_view_node = self.__to_view_item__
+        #self.original_graph = None
 
     #def __to_view_item__(self,object):
     #    return Item(None,None,None,None,object,object.value)
@@ -59,9 +60,19 @@ class App:
         self.variable_filename = StringVar(self.root, 'Новый файл')
         self._add_status_bar()
         self.file_name_graph = None
+        self.original_graph = None
         #self.canvas = tk.Canvas(root, width=800, height=600, bg='white')
+        #add text and scrollbar:
+        s = tk.Scrollbar(root)
+        t = tk.Text(root, height =40, width = 50)
+        t.pack(side=LEFT, fill=Y)
+        s.pack(side=LEFT, fill=Y)
 
-        self.canvas = GraphCanvas(root,800,600)
+        t.config(yscrollcommand=s.set)
+        self.textfield = t
+
+
+        self.canvas = GraphCanvas(root,self,800,600)
         self.root.bind("<Shift-X>", self.canvas.on_shift_x_press)
 
 
@@ -83,6 +94,13 @@ class App:
         help_menu = Menu(menubar)
         help_menu.add_command(label='Keymap', command=self._show_help_keymap)
         menubar.add_cascade(label="Help", menu=help_menu)
+
+    def update_text(self):
+        og = self.original_graph
+        text = og.dumps_roots()
+        self.textfield.delete("1.0", "end")
+        self.textfield.insert(END,text)
+
 
     def _show_help_keymap(self):
         text = """
@@ -144,6 +162,8 @@ class App:
                 else:
                     format = "indents"
                 og, roots = load_lines(lines,format,gtype="dict")
+                self.original_graph = og
+                self.update_text()
                 if not roots:
                     print("--- EMPTY Graph loaded: ---")
                     return
