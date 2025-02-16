@@ -52,6 +52,18 @@ class gCanvasClzItemRenderer:
                isinstance(item.right,(int,float)) and isinstance(item.top,(int,float))
 
     def create_visual_item(self, canvas,item):
+
+        header_str, shown_fields = self.get_header_and_shown_fields_of(canvas,item)
+
+        self.__create_visual_item__(canvas,item,header_str, shown_fields)
+
+    def redraw_visual_item(self,canvas,item):
+        header_str, shown_fields = self.get_header_and_shown_fields_of(canvas, item)
+
+        self.__redraw_visual_item__(canvas, item, header_str, shown_fields)
+
+
+    def get_header_and_shown_fields_of(self, canvas,item):
         controller = canvas.controller
         if not hasattr(item, "value"):
             header_str, shown_fields = self.__header_and_shown_fields_for_default__(item)
@@ -63,8 +75,31 @@ class gCanvasClzItemRenderer:
         else:
             header_str, shown_fields = self.__header_and_shown_fields_for_default__(item.value)
 
+        return header_str, shown_fields
 
-        self.__create_visual_item__(canvas,item,header_str, shown_fields)
+
+
+    def __redraw_visual_item__(self,canvas,item,header_str, shown_fields):
+        visual_ids = item.visuals
+
+        header_text_id =visual_ids[0]
+        canvas.itemconfig(header_text_id, text=header_str)
+
+        if shown_fields:
+            body_text_id = visual_ids[1]
+            #update body:
+            lines = []
+            for field_name, value in shown_fields:
+                line = f"{field_name} : {value}"
+                lines.append(line)
+
+            lined_text = "\n".join(lines)
+            canvas.itemconfig(body_text_id, text=lined_text)
+
+
+
+
+
 
 
     def __create_visual_item__(self,canvas,item,header_str, shown_fields):
@@ -175,12 +210,9 @@ class gCanvasClzItemRenderer:
             original_graph.replace_value(old_value,text)
         else:
             assert False , f" update_text_on_item unfinished for graph type {type(original_graph)}"
-        if 2 == len(item.visuals):
-            #this is primitive value
-            canvas_object_id = item.visuals[0]
-            canvas.itemconfig(canvas_object_id, text=str(item.value))
-        else:
-            assert False, f" update_text_on_item unfinished for item type {type(item.value)} , {item.visuals=}"
+
+        self.redraw_visual_item(canvas, item)
+
 
 
 
