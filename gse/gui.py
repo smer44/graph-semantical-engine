@@ -63,12 +63,14 @@ class App:
         self.original_graph = None
         #self.canvas = tk.Canvas(root, width=800, height=600, bg='white')
         #add text and scrollbar:
-        s = tk.Scrollbar(root)
+
         t = tk.Text(root, height =40, width = 50)
+        s = tk.Scrollbar(root, command = t.yview)
         t.pack(side=LEFT, fill=Y)
         s.pack(side=LEFT, fill=Y)
 
         t.config(yscrollcommand=s.set)
+        #root.bind_mouse_scroll(t, s)
         self.textfield = t
 
 
